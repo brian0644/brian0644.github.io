@@ -18,8 +18,8 @@ EDA: 가공하지 않은 원천의 데이터를 탐색하고 분석하는 것 (b
 ## 2. 공분산과 상관성 분석  
 공분산 : 서로 공유하는 분산값 but 두 변수간의 상관성 정도는 파악 불가  
 상관계수 : 공분산이 설명하지 못하는 상관성의 정도를 나타냄 (by 각자의 표준편차로 나눔)
-<img width="236" alt="스크린샷 2024-07-26 오후 5 44 11" src="https://github.com/user-attachments/assets/61b7d8d8-1d4c-45fd-81ca-a60a08d7a355">  
-<img width="189" alt="스크린샷 2024-07-26 오후 5 44 34" src="https://github.com/user-attachments/assets/f5092017-45d1-402f-a1bb-71d84419280e">
-
+<p style="text-align: center;">
+<img width="236" alt="스크린샷 2024-07-26 오후 5 44 11" src="https://github.com/user-attachments/assets/61b7d8d8-1d4c-45fd-81ca-a60a08d7a355"><img width="189" alt="스크린샷 2024-07-26 오후 5 44 34" src="https://github.com/user-attachments/assets/f5092017-45d1-402f-a1bb-71d84419280e">
+</p>
 **중요한 것은 상관계수의 값과 직선의 기울기**
 
