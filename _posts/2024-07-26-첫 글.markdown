@@ -14,7 +14,7 @@ EDA: 가공하지 않은 원천의 데이터를 탐색하고 분석하는 것 (b
 * 변수간 관계성 확인  
 * 분석 목적과 방향성 점검 및 보정  
 
-### EDA 실습
+### * EDA 실습
 ```python
 # [1] 필요한 패키지 임포트
 import seaborn as sns 
@@ -46,11 +46,50 @@ sns.displot(df['lead_time'])        # 변수 1개 시각화
 sns.violinplot(x="hotel",y="lead_time", data=df, inner=None, color=".8")
 sns.stripplot(x="hotel",y="lead_time", data=df, size=1)) # 변수 1개로 두개 그래프 생성.
 ```
+_____________________________________________________________________________________________________________________________________
+
 ## 2. 공분산과 상관성 분석  
 공분산 : 서로 공유하는 분산값 but 두 변수간의 상관성 정도는 파악 불가  
 상관계수 : 공분산이 설명하지 못하는 상관성의 정도를 나타냄 (by 각자의 표준편차로 나눔)
 <p style="text-align: center;">
 <img width="236" alt="스크린샷 2024-07-26 오후 5 44 11" src="https://github.com/user-attachments/assets/61b7d8d8-1d4c-45fd-81ca-a60a08d7a355"><img width="189" alt="스크린샷 2024-07-26 오후 5 44 34" src="https://github.com/user-attachments/assets/f5092017-45d1-402f-a1bb-71d84419280e">
 </p>
-**중요한 것은 상관계수의 값과 직선의 기울기값과 관련없다**  
+>> **중요한 것은 상관계수의 값과 직선의 기울기값과 관련없으며 두 변수의 선형관계만 측정할 수 있다**
+
+### * 공분산과 상관성 분석 실습
+```python
+# [1] 전과 같게 + 필요한 패키지 임포트
+import numpy as np                  # NumPy는 파이썬에서 과학 계산을 위한 핵심 라이브러리
+
+# [2] 데이터 불러오기
+df = pd.read_csv("데이터 경로")
+
+# [3] 산점도 행렬 시각화
+sns.set(font_scale=1.1)             # 폰트 크기 설정
+sns.set_style('ticks')              # 축 눈금 설정
+sns.pairplot(df,diag_kind='kde')    # 상관계수가 1이면 분포로 표시 >> 동일한 변수의 산점도를 분포로 표시, 왜냐면 어짜피 산점도는 직선으로 나오기 때문
+plt.show()                          # 생성한 그래프 출력
+
+# [4] 공분산 확인 (숫자형 자료에만)
+df.cov()                            # 공분산은 두 데이터의 관계이기 때문에 행렬로 나타남. 마찬가지로 vscode에서는 print(안에)
+
+# [5] 피어슨 상관계수 확인 (숫자형 자료에만)
+df.corr(method='pearson')           # 기본 method는 피어슨, 그래서 피어슨 상관계수는 별도로 안적어줘도 됨
+
+# [6] 히트맵 시각화
+sns.heatmap(df.corr(), cmap='viridis') # (데이터, 색상) 설정하는 용도
+
+# [7] clustermap 히트맵 시각화
+sns.clustermap(df.corr(),annot = True, cmap= 'RdYlBu_r',vmin = -1, vmax = -1,)
+
+# [8] 중복 제거 히트맵 시각화 (우상단 제거)
+np.triu(np.ones_like(df.corr()))     # triu는 매트릭스의 우측 상단을 모두 True인 1로, 하단을 False인 0으로 변환. 좌하단 제거는 tril
+
+mask = np.triu(np.ones_like(df.corr(), dtype=np.bool)) # True/False mask 배열로 변환
+
+fig, ax = plt.subplots(figsize=(15,10))
+sns.heatmap(df.corr(), mask=mask, vmin=-1, vmax=1, annot=True, cmap="RdYlBu_r", cbar=True)
+ax.set_title('제목명', pad = 15)
+```
+
 
