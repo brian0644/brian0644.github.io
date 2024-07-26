@@ -1,4 +1,4 @@
-<img width="460" alt="스크린샷 2024-07-26 오후 11 41 15" src="https://github.com/user-attachments/assets/71a8ac8e-21b0-4122-af29-c0485a934554">---
+---
 layout: post
 title:  "ML 1주차 정리"
 date:   2024-07-26 17:13 +09:00
