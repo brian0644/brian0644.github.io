@@ -13,3 +13,23 @@ EDA: 가공하지 않은 원천의 데이터를 탐색하고 분석하는 것 (b
 * 결측값, 이상치 파악 및 보완  
 * 변수간 관계성 확인  
 * 분석 목적과 방향성 점검 및 보정  
+
+```
+# 필요한 패키지 설치
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+import pandas as pd
+sns.set(color_codes=True)
+%matplotlib inline
+
+# 데이터 불러오기
+# https://www.kaggle.com/datasets/jessemostipak/hotel-booking-demand
+df = pd.read_csv("datasets/hotel_bookings.csv")
+
+# 데이터 샘플 확인
+df.head()
+
+df2 = df[['hotel', 'lead_time']]
+df2.head()
+```
