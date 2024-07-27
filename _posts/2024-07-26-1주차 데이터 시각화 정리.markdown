@@ -285,3 +285,107 @@ parallel_coordinates(df3,'Tm',ax=axes, colormap='winter',linewidth = "0.5")
 ____________________________________________________________________________________________________________________________________
 <br>
 <br>
+
+## 5. 분포 시각화
+
+ 데이터가 처음 주어졌을 때, 변수들이 어떤 요소로 어느 정도의 비율로 구성되어 있는지를 확인하는 단계. 통계치만으로도 파악이 가능하지만 분포 시각화를 통해 보다 직관적 파악 가능
+* 연속형 : 양적 척도 / 막대그래프. 선그래프, 히스토그램(bin)
+* 명목형 : 질적 척도 / 파이차트, 도넛차트, 트리맵, 와플차트
+
+  **구성요소가 복잡한 질적 척도를 표현할 때는 트리맵 차트를 이용하면 보다 효과적으로 표현할 수 있다 -> 위계 구조까지 표현 가능 // 와플차트도 비슷하지만 위계 구조 x**
+
+<p style="text-align: center;">
+<img width="475" alt="스크린샷 2024-07-27 오후 4 57 13" src="https://github.com/user-attachments/assets/1c8648bb-a26f-4935-98dc-7b1e622009de">
+<img width="458" alt="스크린샷 2024-07-27 오후 4 57 18" src="https://github.com/user-attachments/assets/a1c48e18-2675-450c-a03a-a34b8d852d7d">
+<img width="470" alt="스크린샷 2024-07-27 오후 4 57 22" src="https://github.com/user-attachments/assets/78b4722f-ab1b-4e6d-b374-37ac769457f4">
+</p>
+  
+### * 비교 시각화 실습
+```python
+# [1] 필요한 패키지 설치 및 이포트
+!pip install plotly
+!pip install pywaffle
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+import numpy as np
+import plotly.express as px
+from pywaffle import Waffle
+
+# [2] 데이터 불러오기
+df = pd.read_csv("데이터 경로")
+
+# [3] 기본 히스토그램 시각화
+df1 = df[['height_cm']]
+plt.hist(df1,bins = 10, label = 'bins=10')
+plt.legend()
+plt.show()
+
+# [4] 남성 여성 히스토그램 시각화
+df1_1 = df[df['sex'].isin(['man'])]       # df 데이터에 있는 sex 중 isin([''])으로 'man'값을 가진 데이터만 df1_1에 저장
+df1_1 = df1_1[['height_cm']]              # 남성의 키만 저장
+df1_2 = df[df['sex'].isin(['woman'])]     # df 데이터에 있는 sex 중 isin([''])으로 'woman'값을 가진 데이터만 df1_2에 저장
+df1_2 = df1_2[['height_cm']]              # 여성의 키만 저장
+plt.hist(df1_1, color = 'green', alpha = 0.2, bins = 10, label = 'MAN', density = True)
+plt.hist(df1_2, color = 'red', alpha = 0.2, bins = 10, label = 'WOMAN', density = True)
+plt.legend()
+plt.show()
+
+# [5] 파이차트, 도넛차트 시각화를 위한 데이터 전처리
+df2 = df[['country','height_cm']]
+df2 = df2[df.height_cm>=175]               # 키 175 이상만 추출
+df2 = df2.groupby('country').count().reset_index()
+ 
+# [6] 파이차트 시각화
+fig = plt.figure(figsize=(8,8)) # 캔버스 생성
+fig.set_facecolor('white')      # 캔버스 배경색 설정
+ax = fig.add_subplot()          # 프레임 생성
+
+ax.pie(df2.height_cm, 
+       labels=df2.country,                    # 라벨 출력
+       startangle=0,                          # 시작점 degree 설정
+       counterclock=False,                    # 시계 방향
+       autopct=lambda p : '{:.1f}%'.format(p) # 퍼센자릿수 설정
+       )
+plt.legend()                                  # 범례 표시
+plt.show()
+
+# [7] 도넛차트 시각화
+wedgeprops={'width': 0.7, 'edgecolor': 'w', 'linewidth': 5} # 차트 형태 옵션 설정
+plt.pie(df2.height_cm, labels=df2.country, autopct='%.1f%%', 
+        startangle=90, counterclock=False, wedgeprops=wedgeprops)
+plt.show()
+
+# [8] 트리맵 차트용 데이터셋 전처리
+df3 = df[['country', 'sex', 'height_cm']]
+df3=df3[df.height_cm >= 175]
+df3 = df3.groupby(['country','sex']).count().reset_index()
+
+# [9] 트리맵 시각화
+fig = px.treemap(df3,
+                 path=['sex','country'],
+                 values='height_cm',
+                 color='height_cm',
+                 color_continuous_scale='viridis')
+fig.show()
+
+# [10] 와플차트 시각화
+fig = plt.figure(
+    FigureClass=Waffle,
+    plots={
+        111: {
+            'values': df2['height_cm'],
+            'labels': ["{0} ({1})".format(n, v) for n, v in df2['country'].items()],
+            'legend': {'loc': 'upper left', 'bbox_to_anchor': (1.05, 1), 'fontsize': 8},
+            'title': {'label': 'Waffle chart test', 'loc': 'left'}
+        }
+    },
+    rows=10,
+    figsize=(10, 10) 
+)
+```
+<br>
+<br>
+____________________________________________________________________________________________________________________________________
+<br>
+<br>
