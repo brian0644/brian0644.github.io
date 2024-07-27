@@ -132,6 +132,49 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import datetime
 
-# [2]
+# [2] 데이터 불러오기
+df = pd.read_csv("데이터 경로")
 
+# [3] date 칼럼 날짜 형식 변환
+df['Date2']= pd.to_datetime(df['Order Date'], infer_datetime_format=True) # Order date 문자형을 날짜형으로 변환해서 Date2 새로운 열로 저장
+df = df.sort_values(by='Date2')                                           # df데이터에 Date2라는 새로운 열을 오름차순으로 정렬
+df['Year'] = df['Date2'].dt.year # 날짜형으로 변환된 Date2의 데이터에서 연도만 빼내기 위해서, .dt(datetime), .year(객체에서 연도 추출)로 Year 칼럼에 저장
+
+# [4] 선그래프용 데이터셋 생성
+df_line = df[df.Year == 2018]    # .Year을 통해 이전에 생성한 연도 칼럼 중 [df.Year == 2018]으로 2018년도 데이터만 선택한 새로운 데이터셋 df_line 정의
+df_line = df_line.groupby('Date2')['Sales'].sum().reset_index() # .groupby('Date2')를 통해 Date2 값들 중 같은 값끼리 묶고 
+                                                                # ['Sales'].sum()을 통해 Date2가 같은(같은 날) 값들 중 Sales의 합산 계산
+                                                                # .reset_index()를 통해 0,1,2.. 기준으로 정렬(SQL의 auto incremental)
+
+# [5] 30일 이동평균 생성
+df_line['Month'] = df_line['Sales'].rolling(window=30).mean() # Month라는 새로운 열 생성,합계된 일별 판매량 데이터를 30일 씩 묶어서 이동평균계산 후 저장
+
+# [6] 선그래프 시각화
+ax = df_line.plot(x='Date2', y='Sales', linewidth = "0.5") # df_line의 데이터 중 X축은 Date2, Y축은 Sales로 선그래프 -> 일별 총 판매량 선 그래프
+df_line.plot(x='Date2', y='Month', color='', linewidth ="", ax=ax) # 30일 이동평균 또한 그래프 생성 -> 추이선, ax=ax로 두그래프 겹치게 생성
+
+
+
+# [7] 막대그래프용 데이터셋 생성
+df_bar_1 = df.groupby('Year')['Sales'].sum().reset_index() # 연도별 판매량 데이터셋 생성
+
+# [8] 연도별 매출액 막대그래프 시각화
+ax = df_bar_1.plot.bar(x='Year', y='Sales', rot=0, figsize = (10,5))
+
+# [9] 연도별, 고객별 매출액 데이터셋 생성
+df_bar_2 = df.groupby(['Year','Segment'])['Sales'].sum().reset_index()
+
+# [10] 고객별 칼럼으로 피벗
+df_bar_2_pv = df_bar_2.pivot(index = 'Year', columns = 'Segment', values = 'Sales').reset_index() # Year은 2018행 2019행 이렇게 인덱스 역할
+                                                                      # Segment 열의 고유한 값들(Customer, Corporate)은 피벗 테이블의 열로 사용
+                                                                      # Sales의 값들이 value로 채워짐
+
+# [11] 연도별 고객별 매출액 누적 막대 그래프 시각화
+df_bar_2_pv.plot.bar(x = 'Year',stacked = True, figsize=() ) # stacked=True로 고객별 금액 누적 합산 출력, 애초에 값들이 Sales라 별도 y축 지정안함
+                                                             # stacked=False로 두면 각 연도별로 세개의 막대 그래프 표현
 ```
+<br>
+<br>
+____________________________________________________________________________________________________________________________________
+<br>
+<br>
