@@ -16,6 +16,7 @@ categories: ML
 
 ### * EDA 실습
 ```python
+##https://github.com/c-karl/DA_DS_Book001/blob/main/10.1.2.탐색적%20데이터%20분석(EDA).ipynb 참고
 # [1] 필요한 패키지 임포트
 import seaborn as sns 
 import matplotlib.pylot as plt      # seabron과 matplotlib은 그래프 그리기용 패키지
@@ -190,16 +191,96 @@ ________________________________________________________________________________
 <img width="373" alt="스크린샷 2024-07-27 오후 3 07 43" src="https://github.com/user-attachments/assets/c801f900-ca66-48e6-a7e8-cce3ab83e2b9">
 <img width="458" alt="스크린샷 2024-07-27 오후 3 07 53" src="https://github.com/user-attachments/assets/c4b1fa4d-9f7f-4d44-a68b-dfbb0f734705">
 <img width="402" alt="스크린샷 2024-07-27 오후 3 07 59" src="https://github.com/user-attachments/assets/fe204691-9b21-40b7-8f7e-f535c77a8131">
-
 </p>
 
-**막대형의 경우 1년 동안의 월 간격 단위 흐름과 같이 시간의 밀도가 낮은경우 활용, 누적 막대그래프는 한 시점에 2개 이상의 세부 항목이 존재할때 사용한다.**
+  
+### * 비교 시각화 실습
+```python
+# [1] 필요한 패키지 임포트
+import matplotlib.pyplot as plt
+import pandas as pd
+import datetime
+import seaborn as sns
+import numpy as np
+from math import pi
+from pndas.plotting import parallel_coordinates
 
-<p style="text-align: center;">
-<img width="460" alt="스크린샷 2024-07-26 오후 11 41 15" src="https://github.com/user-attachments/assets/46eda5e7-a1ce-4c33-93e4-4f9a5d1e992e">
-</p>
+# [2] 데이터 불러오기
+df = pd.read_csv("데이터 경로")
 
+# [3] 히트맵 시각화 V1을 위한 데이터 전처리
+df1 = df[df['Tm'].isin(['ATL','BOS','BRK','CHI','CHO'])] # df 데이터에 있는 Tm(팀) 중 isin([''])으로 해당하는 5개의 팀만 df1에 저장
+df1 = df1[['Tm','ORB%','TRB%','AST%','BLK%','USG%']]     # df1는 원래 선택된 5개 팀에 대한 모든 칼럼을 저장했지만 6개 칼럼으로 축소
+df1 = df1.groupby('Tm').mean()                           # 팀별로 묶어서 정렬, Tm을 제외한 5개 칼럼의 평균값 계산 후 df1에 저장
 
-### * 시간 시각화 실습
+# [4] 히트맵 시각화 V1
+fig = plt.figure(figsize(8,8))  # 8x8 그림 생성
+fig.set_facecolor('white')      # 그림 객체 배경 색칠
+plt.pcolor(df1.values)          # df1 데이터프레임의 값을 사용하여 히트맵을 그림
 
+plt.xticks(range(len(df1.columns)),df1.columns) # 위에서 생성한 그림 객체에 df1의 열 개수만큼 x축 틱(tick)을 생성, 그 틱의 위치에 df1의 열 이름을 대입
+plt.yticks(range(len(df1.index)),df1.index)     # 위에서 생성한 그림 객체에 df1의 행 개수만큼 y축 틱(tick)을 생성, 그 틱의 위치에 df1의 행 이름을 대입
+plt.xlabel('Value', fontsize = )                # x축의 이름 표시 
+plt.ylabel('Team', fontsize = )                 # y축의 이름 표시
+plt.colorbar()                                  # 우측 색상 설명 바 표시
+plt.show()
 
+# [5] 히트맵 시각화 V2를 위한 데이터 전처리
+df2 = df[df['Tm'].isin(['ATL','BOS','BRK','CHI','CHO'])] # df 데이터에 있는 Tm(팀) 중 isin([''])으로 해당하는 5개의 팀만 df2에 저장
+df2 = df2[['Tm','Age','G']]                              # df2는 원래 선택된 5개 팀에 대한 모든 칼럼을 저장했지만 3개 칼럼으로 축소
+df2 = df2.groupby(['Tm','Age']).mean().reset_index()     # 팀별, 나이별로 묶어서 정렬, 남은 칼럼인 게임수 G에 대한 평균 계산 > 팀 속 나이별 평균게임 수
+df2 = df2.pivot(index='Tm', columns='Age', values='G')   # 팀을 인덱스로, 칼럼은 나이, 평균 게임수가 데이터
+
+# [6] 히트맵 시각화 V2
+fig = plt.figure(figsize=(8,8)) # 8x8 그림 생성
+fig.set_facecolor('white')      # 그림 객체 배경 색칠
+plt.pcolor(df2.values)          # df2 데이터프레임의 값을 사용하여 히트맵을 그림
+
+plt.xticks(range(len(df2.columns)), df2.columns) # 위에서 생성한 그림 객체에 df2의 열 개수만큼 x축 틱(tick)을 생성, 그 틱의 위치에 df2의 열 이름을 대입
+plt.yticks(range(len(df2.index)), df2.index)     # 위에서 생성한 그림 객체에 df2의 행 개수만큼 y축 틱(tick)을 생성, 그 틱의 위치에 df2의 행 이름을 대입
+plt.xlabel('Age', fontsize = )                   # x축의 이름 표시
+plt.ylabel('Team', fontsize = )                  # y축의 이름 표시
+plt.colorbar()                                   # 우측 색상 설명 바 표시
+plt.show()
+
+# [7] 방사형 차트 시각화
+df3 = df1.reset_index()                          # df1 데이터 인덱스 초기화 후 df3에 저장
+labels = df3.columns[1:]                         # df3의 칼럼을 0번 이후 1번부터 받아서 끝까지 Label로 저장
+num_labels = len(labels)                         # 1~5까지니까 5 저장
+angles = [x/float(num_labels)*(2*pi) for x in range(num_labels)] #x = 등분하고 싶은 점, num_label = n등분 > 즉 n등분한 등분점의 각도 계산
+angles += angles[:1]                             # angles 리스트의 마지막에 첫 번째 요소가 추가 > 리스트에는 n+1개의 원소
+
+mypalette = plt.cm.get_cmap("Set2", len(df3.index)) # mypalette는 Set2 컬러맵에서 df3 데이터프레임의 행 수에 맞는 색상 팔레트를 생성
+
+fig = pit.figure(figsize=(15,20))                   # 15x20 그림 생성
+fig.set_facecolor('white')                          # 그림 객체 배경 색칠
+
+for i, row in df3.iterrows():
+    color = my_palette(i)
+    data = df3.iloc[i].drop('Tm').tolist()
+    data += data[:1]
+
+ax = plt.subplot(3,2,i+1, polar=True)
+    ax.set_theta_offset(pi / 2) # 시작점 설정
+    ax.set_theta_direction(-1)  # 시계방향 설정
+    plt.xticks(angles[:-1], labels, fontsize=13)    # 각도 축 눈금 생성
+    ax.tick_params(axis='x', which='major', pad=15) # 각 축과 눈금 사이 여백생
+    ax.set_rlabel_position(0)                       # 반지름 축 눈금 라벨 각도 0으로 설정
+    plt.yticks([0,5,10,15,20],['0','5','10','15','20'], fontsize=10)    # 반지름 축 눈금 설정
+    plt.ylim(0,20)
+    ax.plot(angles, data, color=color, linewidth=2, linestyle='solid')  # 방사형 차트 출력
+    ax.fill(angles, data, color=color, alpha=0.4)                       # 도형 안쪽 색상 설정
+    plt.title(row.Tm, size=20, color=color,x=-0.2, y=1.2, ha='left')    # 각 차트의 제목 생성
+plt.tight_layout(pad=3) # 차트 간 간격 설정 
+plt.show()
+
+# [8] 평행 좌표 그래프 생성
+fig,axes = plt.subplots()
+plt.figure(figsize=(16,8)) # 그래프 크기 조정
+parallel_coordinates(df3,'Tm',ax=axes, colormap='winter',linewidth = "0.5")
+```
+<br>
+<br>
+____________________________________________________________________________________________________________________________________
+<br>
+<br>
