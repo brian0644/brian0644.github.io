@@ -21,8 +21,15 @@ GEM
     faraday-retry (2.2.1)
       faraday (~> 2.0)
     ffi (1.16.3)
+    ffi (1.16.3-x64-mingw-ucrt)
     forwardable-extended (2.6.0)
     google-protobuf (4.27.2-arm64-darwin)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.27.2-x64-mingw-ucrt)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.27.2-x86_64-darwin)
       bigdecimal
       rake (>= 13)
     google-protobuf (4.27.2-x86_64-linux)
@@ -94,6 +101,8 @@ GEM
     safe_yaml (1.0.5)
     sass-embedded (1.77.5-arm64-darwin)
       google-protobuf (>= 3.25, < 5.0)
+    sass-embedded (1.77.5-x64-mingw-ucrt)
+      google-protobuf (>= 3.25, < 5.0)
     sass-embedded (1.77.5-x86_64-darwin)
       google-protobuf (>= 3.25, < 5.0)
     sass-embedded (1.77.5-x86_64-linux-gnu)
@@ -113,12 +122,12 @@ GEM
       tzinfo (>= 1.0.0)
     unicode-display_width (2.5.0)
     uri (0.13.0)
-    wdm (0.1.1)
     webrick (1.8.1)
 
 PLATFORMS
   arm64-darwin-23
   universal-darwin-21
+  x64-mingw-ucrt
   x86_64-linux
   x86_64-linux-musl
 
@@ -137,10 +146,10 @@ DEPENDENCIES
   jekyll-sitemap (~> 1.4.0)
   jgd (~> 1.14.0)
   kramdown
+  listen (~> 3.7)
   puma
   tzinfo (~> 2.0)
   tzinfo-data
-  wdm (~> 0.1.1)
   webrick (~> 1.7)
 
 BUNDLED WITH
