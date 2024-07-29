@@ -92,7 +92,7 @@ theme_mode: light [light | dark]
 cdn:
 
 # the avatar on sidebar, support local or CORS resources
-avatar: /Users/brian0644/Desktop/데스크탑 - 임주현의 MacBook Air/paka.jpg
+avatar: /Users/brian0644/Downloads/paka.jpg
 
 # The URL of the site-wide social preview image used in SEO `og:image` meta tag.
 # It can be overridden by a customized `page.image` in front matter.
