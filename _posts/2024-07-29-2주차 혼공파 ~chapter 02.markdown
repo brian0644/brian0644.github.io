@@ -83,8 +83,9 @@ plt.show()
 <br>
 <img width="511" alt="스크린샷 2024-07-29 오후 3 41 14" src="https://github.com/user-attachments/assets/bf40077e-3c02-41d3-9095-3534948942f5">
 <br>
-  원리는 이와 같다. K-NN으로 학습된 모델에 데이터를 입력하면 해당 데이터와 유사한(주위의 : nearest) 다른 데이터를 보고 다수를 차지하는 것을 정답으로 사용
-  k-Nearest Neightbors 알고리즘을 사용하기 위해 도미와 빙어 데이터 하나로 합치기 (데이버를 합쳐서 구분 못하게) -> 사이킷런 패키지를 사용하기 위해 2차원 리스트로 수정
+    원리는 이와 같다. K-NN으로 학습된 모델에 데이터를 입력하면 해당 데이터와 유사한(주위의 : nearest) 다른 데이터를 보고 다수를 차지하는 것을 정답으로 사용
+<br>
+    k-Nearest Neightbors 알고리즘을 사용하기 위해 도미와 빙어 데이터 하나로 합치기 (데이버를 합쳐서 구분 못하게) -> 사이킷런 패키지를 사용하기 위해 2차원 리스트로 수정
   
 ```python
 fish_data = [[l,w] for l,w in zip(length,weight)] #lengh와 weight 리스트의 값들을 차례대로 fish_data라는 2차원 리스트 변수에 저장
