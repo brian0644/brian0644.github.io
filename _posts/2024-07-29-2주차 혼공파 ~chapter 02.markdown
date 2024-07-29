@@ -18,8 +18,12 @@ categories: ML
 <img width="1352" alt="스크린샷 2024-07-29 오후 2 22 44" src="https://github.com/user-attachments/assets/82a7ad59-5d6c-40c9-9da1-af61e03aa213">
 <img width="606" alt="스크린샷 2024-07-29 오후 2 26 37" src="https://github.com/user-attachments/assets/2f963898-12eb-4e88-8edf-fe029ba6c6aa">
 <br>
+<br>
+
  * 코드 셀 : 코드를 입력하고 실행할 수 있는 창
+<br>
 <img width="343" alt="스크린샷 2024-07-29 오후 2 27 53" src="https://github.com/user-attachments/assets/27b1f1d9-b494-4295-ba6a-576043a24233">
+<br>
 <br>
  * 노트북 : 대화식 프로그래밍 환경. VM(가상 서버)를 통해 메모리 12기가 및 디스크 100기가까지 무료로 이용 가능, 그러나 코랩 노트북으로 동시에 사용할 수 있는 가상 서버는 최대 5개
 
