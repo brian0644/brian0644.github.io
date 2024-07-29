@@ -160,15 +160,38 @@ kn.predict(test_input)                 # 테스트용 데이터로 예측 했을
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ 
 
+## 2-2 데이터 전처리
+* 넘파이로 데이터 준비하기 : array 함수를 통해 넘파이 배열로 변환하거나, column_stack 함수를 통해 리스트를 나란히 붙여서 데이터 준비
+* 사이킷런으로 훈련 세트와 테스트 세트 나누기 : 앞에서는 shuffle로 섞었지만 사이킷런에는 train_test_split() 함수 존재  
+<br>
 
-\
-두 번째 머신러닝 프로그램
+```python
+fish_length = [25.4, 26.3, 26.5, 29.0, 29.0, 29.7, 29.7, 30.0, 30.0, 30.7, 31.0, 31.0, 
+                31.5, 32.0, 32.0, 32.0, 33.0, 33.0, 33.5, 33.5, 34.0, 34.0, 34.5, 35.0, 
+                35.0, 35.0, 35.0, 36.0, 36.0, 37.0, 38.5, 38.5, 39.5, 41.0, 41.0, 9.8, 
+                10.5, 10.6, 11.0, 11.2, 11.3, 11.8, 11.8, 12.0, 12.2, 12.4, 13.0, 14.3, 15.0]
+fish_weight = [242.0, 290.0, 340.0, 363.0, 430.0, 450.0, 500.0, 390.0, 450.0, 500.0, 475.0, 500.0, 
+                500.0, 340.0, 600.0, 600.0, 700.0, 700.0, 610.0, 650.0, 575.0, 685.0, 620.0, 680.0, 
+                700.0, 725.0, 720.0, 714.0, 850.0, 1000.0, 920.0, 955.0, 925.0, 975.0, 950.0, 6.7, 
+                7.5, 7.0, 9.7, 9.8, 8.7, 10.0, 9.9, 9.8, 12.2, 13.4, 12.2, 19.7, 19.9]  # 현재 길이 데이터와 무게 데이터가 각각 1차원 리스트로 나뉘어있는 상태 -> column_stack 함수를 통해 나란히 붙여서 2차원 배열로 만드는 과정 필요
+
+fish_data = np.column_stack((fish_lengh, fish_weight))       
+fish_target = np.concatenate((np.ones(35), np.zeros(14))) # 임의의 타깃 생성, 리스트 뒤로 나란히 붙이기
+
+from sklearn.modlel_selection import train_test_split     # 훈련용, 테스트용 세트 나누기 위한 함수 임포트
+train_input, test_input, train_target, test_target = train_test_split(fish_data, fish_target, stratify=fish_target, random_state=42) # stratify=fish_target을 통해 원래 타깃 값 도미 35마리 빙어 14마리 비율에 맞도록 훈련용과 테스트용에 분배
+                                                                                                                                     # random_state=42는 이전 seed와 마찬가지로 해당 랜덤 셋업 저장
+                                                                                                                                     # print(train_input.shape, test_input.shape)과 print(train_target.shape, test_target.shape) 를 통해 데이터 개수 및 특성 개수 확인
+
+from sklearn.neighbors import KNeighborsClassifier
+kn = KNeighborsClassifier()
+kn.fit(train_input, train_target)
+kn.score(test_input, test_target)
+```
 
 
 
-02-2 데이터 전처리
-넘파이로 데이터 준비하기
-사이킷런으로 훈련 세트와 테스트 세트 나누기
+
 수상한 도미 한 마리
 기준을 맞춰라
 전처리 데이터로 모델 훈련하기
