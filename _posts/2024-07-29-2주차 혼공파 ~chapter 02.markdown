@@ -81,12 +81,38 @@ plt.show()
 <img width="1003" alt="스크린샷 2024-07-29 오후 3 10 52" src="https://github.com/user-attachments/assets/7b467d7e-6d35-4577-a782-2308830e429d">
  
  **결과 : 빙어 데이터는 주황색, 빙어도 도미와 비슷하게 길이와 무게에 비례하지만 그 기울기가 도미보단 작아보임**
-
-
-
-
+<br>
+<br>
+<br>
+<br>
+<br>
 #### k-Nearest Neighbors 알고리즘
-
+<br>
+<img width="511" alt="스크린샷 2024-07-29 오후 3 41 14" src="https://github.com/user-attachments/assets/bf40077e-3c02-41d3-9095-3534948942f5">
+<br>
+  원리는 이와 같다. K-NN으로 학습된 모델에 데이터를 입력하면 해당 데이터와 유사한(주위의 : nearest) 다른 데이터를 보고 다수를 차지하는 것을 정답으로 사용
+  k-Nearest Neightbors 알고리즘을 사용하기 위해 도미와 빙어 데이터 하나로 합치기 (데이버를 합쳐서 구분 못하게) -> 사이킷런 패키지를 사용하기 위해 2차원 리스트로 수정
+  
+```python
+fish_data = [[l,w] for l,w in zip(length,weight)] #lengh와 weight 리스트의 값들을 차례대로 fish_data라는 2차원 리스트 변수에 저장
+```  
+  
+  이제 어떤 길이와 무게를 가질떄 =도미, =빙어 인지에 대한 정답 처리 , 사이킷런 패키지 임포트 후 학습시키기 
+  
+```python
+fish_target = [1] * 35 + [0] * 14                 # 0~34번 인덱스까지는 1 = 도미 , 36~49번 인덱스까지는 0 = 빙어
+from sklearn.neighbors import KNeighborsClassifier
+kn = KNeighborsClassifier()                       # KNeighborsClassifier 클래스의 객체 생성
+kn.fit(fish_data, fish_target)                    # kn 객체에 데이터와 정답을 전달 -> 학습
+```  
+  
+ **이제 훈련이 완료되었기 때문에 모델 평가하기 > 사이킷런에서 모델을 평가하는 메서드는 score()**
+  
+```python
+kn.score(fish_data, fish_target)
+kn.predict([[30,600]])         # predict 함수에 입력한 값이 잘 분류 되는 지 확인
+```  
+  
 
 
 
