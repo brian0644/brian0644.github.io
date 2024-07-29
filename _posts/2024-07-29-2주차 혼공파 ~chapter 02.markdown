@@ -104,10 +104,14 @@ kn.fit(fish_data, fish_target)                    # kn 객체에 데이터와 �
   
 ```python
 kn.score(fish_data, fish_target)
-kn.predict([[30,600]])         # predict 함수에 입력한 값이 잘 분류 되는 지 확인
+kn.predict([[30,600]])                            # predict 함수에 입력한 값이 잘 분류 되는 지 확인
 ```  
   
-
+**정리하자면**<br>
+1. 데이터를 2차원 배열로 준비하기
+2. 데이터에 대한 정답을 2차원 배열로 준비하기
+3. kn = KNeighborsClassifier()으로 학습모델 생성 후 kn.fit(데이터, 정답)
+4. kn.score(데이터, 정답)으로 학습 잘 되었는지 확인, kn.predict(데이터)로 잘 분류하는지 확인
 
 
 
