@@ -2,7 +2,7 @@
 layout: post
 title:  "ML 2주차 정리"
 date:   2024-07-29 14:00 +09:00
-categories: ML
+categories: khuda ML session
 ---
 # **1. 나의 첫 머신러닝**
 ## 1-1. 인공지능과 머신러닝, 딥러닝
