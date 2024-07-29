@@ -16,18 +16,11 @@ categories: ML
 
 ## 1-2 코랩과 주피터 노트북
  * 구글 코랩 : 웹 브라우저에서 무료로 파이썬 프로그램을 테스트하고 저장할 수 있는 서비스. 머신러닝 프로그램도 개발 가능. 클라우드 기반의 주피터 노트북 >> 컴퓨터 성능 상관 없음
-<img width="1427" alt="스크린샷 2024-07-29 오후 2 19 51" src="https://github.com/user-attachments/assets/be193fe5-03f3-416f-b4b7-0126deccc427">
-
 <br>
 <br>
  * 텍스트 셀 : 텍스트를 입력는 창. 텍스트 셀에서는 HTML과 Markdown을 혼용해서 사용 가능
 <br>
-<img width="1352" alt="스크린샷 2024-07-29 오후 2 22 44" src="https://github.com/user-attachments/assets/82a7ad59-5d6c-40c9-9da1-af61e03aa213">
-
-<img width="606" alt="스크린샷 2024-07-29 오후 2 26 37" src="https://github.com/user-attachments/assets/2f963898-12eb-4e88-8edf-fe029ba6c6aa">  
-
 <img width="600" alt="스크린샷 2024-07-29 오후 2 37 09" src="https://github.com/user-attachments/assets/e1a9c092-5588-417c-ac6d-e02501ee49b2">
-
 <br>
 <br>
   * 코드 셀 : 코드를 입력하고 실행할 수 있는 창
