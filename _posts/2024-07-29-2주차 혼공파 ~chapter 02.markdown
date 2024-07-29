@@ -23,7 +23,7 @@ categories: ML
 
 <br>
 <br>
- * 코드 셀 : 코드를 입력하고 실행할 수 있는 창
+  * 코드 셀 : 코드를 입력하고 실행할 수 있는 창
 <br>
 <img width="343" alt="스크린샷 2024-07-29 오후 2 27 53" src="https://github.com/user-attachments/assets/27b1f1d9-b494-4295-ba6a-576043a24233">
 <br>
@@ -52,6 +52,7 @@ plt.ylabel("weight")
 plt.show()
 ```  
 <img width="1014" alt="스크린샷 2024-07-29 오후 3 05 21" src="https://github.com/user-attachments/assets/5a8391ba-ac4c-4e78-83a6-4dde95d168d2">
+
  **결과 : 생선 길이에 따라 무게가 선형적으로 증가하는 관계로 해석 가능**
   
  도미 데이터를 확인했으니 이제 빙어 데이터 준비 및 시각화
@@ -67,6 +68,7 @@ plt.ylabel("weight")
 plt.show()
 ```  
 <img width="1003" alt="스크린샷 2024-07-29 오후 3 10 52" src="https://github.com/user-attachments/assets/7b467d7e-6d35-4577-a782-2308830e429d">
+ 
  **결과 : 빙어 데이터는 주황색, 빙어도 도미와 비슷하게 길이와 무게에 비례하지만 그 기울기가 도미보단 작아보임**
 
 
