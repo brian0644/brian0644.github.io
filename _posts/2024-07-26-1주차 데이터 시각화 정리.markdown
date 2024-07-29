@@ -58,9 +58,6 @@ ________________________________________________________________________________
   공분산 : 서로 공유하는 분산값 but 두 변수간의 상관성 정도는 파악 불가  
   상관계수 : 공분산이 설명하지 못하는 상관성의 정도를 나타냄 (by 각자의 표준편차로 나눔)
   
-<p style="text-align: center;">
-<img width="236" alt="스크린샷 2024-07-26 오후 5 44 11" src="https://github.com/user-attachments/assets/61b7d8d8-1d4c-45fd-81ca-a60a08d7a355"><img width="189" alt="스크린샷 2024-07-26 오후 5 44 34" src="https://github.com/user-attachments/assets/f5092017-45d1-402f-a1bb-71d84419280e">
-</p>
 
 **중요한 것은 상관계수의 값과 직선의 기울기값과 관련없으며 두 변수의 선형관계만 측정할 수 있다**
 
@@ -116,13 +113,13 @@ ________________________________________________________________________________
 
 
 <p style="text-align: center;">
-<img width="296" alt="스크린샷 2024-07-26 오후 11 41 10" src="https://github.com/user-attachments/assets/1deaa378-27b3-4f5c-b9e4-cea2ed65f07c">
+<img width="296" alt="스크린샷 2024-07-26 오후 11 41 10" src="https://github.com/user-attachments/assets/ddd69be9-b1b8-4242-a929-e31eb2789bfb">
 </p>
 
 **막대형의 경우 1년 동안의 월 간격 단위 흐름과 같이 시간의 밀도가 낮은경우 활용, 누적 막대그래프는 한 시점에 2개 이상의 세부 항목이 존재할때 사용한다.**
 
 <p style="text-align: center;">
-<img width="460" alt="스크린샷 2024-07-26 오후 11 41 15" src="https://github.com/user-attachments/assets/46eda5e7-a1ce-4c33-93e4-4f9a5d1e992e">
+<img width="460" alt="스크린샷 2024-07-26 오후 11 41 15" src="https://github.com/user-attachments/assets/807951ad-c4cf-48e4-b5af-158dc7fbd77b">
 </p>
 
 
@@ -189,9 +186,9 @@ ________________________________________________________________________________
 
   
 <p style="text-align: center;">
-<img width="373" alt="스크린샷 2024-07-27 오후 3 07 43" src="https://github.com/user-attachments/assets/c801f900-ca66-48e6-a7e8-cce3ab83e2b9">
-<img width="458" alt="스크린샷 2024-07-27 오후 3 07 53" src="https://github.com/user-attachments/assets/c4b1fa4d-9f7f-4d44-a68b-dfbb0f734705">
-<img width="402" alt="스크린샷 2024-07-27 오후 3 07 59" src="https://github.com/user-attachments/assets/fe204691-9b21-40b7-8f7e-f535c77a8131">
+<img width="373" alt="스크린샷 2024-07-27 오후 3 07 43" src="https://github.com/user-attachments/assets/418e14b9-2a06-4d5b-acb7-38d1ca2a1c75">
+<img width="458" alt="스크린샷 2024-07-27 오후 3 07 53" src="https://github.com/user-attachments/assets/36deea58-52fe-4e7a-9047-4e62efc57038">
+<img width="402" alt="스크린샷 2024-07-27 오후 3 07 59" src="https://github.com/user-attachments/assets/23db9735-cb76-47b3-8a31-fd27a96c634e">
 </p>
 
   
@@ -295,9 +292,9 @@ ________________________________________________________________________________
   **구성요소가 복잡한 질적 척도를 표현할 때는 트리맵 차트를 이용하면 보다 효과적으로 표현할 수 있다 -> 위계 구조까지 표현 가능 // 와플차트도 비슷하지만 위계 구조 x**
 
 <p style="text-align: center;">
-<img width="475" alt="스크린샷 2024-07-27 오후 4 57 13" src="https://github.com/user-attachments/assets/1c8648bb-a26f-4935-98dc-7b1e622009de">
-<img width="458" alt="스크린샷 2024-07-27 오후 4 57 18" src="https://github.com/user-attachments/assets/a1c48e18-2675-450c-a03a-a34b8d852d7d">
-<img width="470" alt="스크린샷 2024-07-27 오후 4 57 22" src="https://github.com/user-attachments/assets/78b4722f-ab1b-4e6d-b374-37ac769457f4">
+<img width="475" alt="스크린샷 2024-07-27 오후 4 57 13" src="https://github.com/user-attachments/assets/2e7fdc85-3bd1-4e4e-8571-bf8d5b2f3a04">
+<img width="458" alt="스크린샷 2024-07-27 오후 4 57 18" src="https://github.com/user-attachments/assets/dd8bed16-a3f4-4056-8108-a4c64d0c7f20">
+<img width="470" alt="스크린샷 2024-07-27 오후 4 57 22" src="https://github.com/user-attachments/assets/ba856a5a-bc75-4273-bea4-d932fbb64e5c">
 </p>
   
 ### * 비교 시각화 실습
@@ -399,8 +396,8 @@ ________________________________________________________________________________
   + 산점도는 두 개의 변수간 관계만 표현할 수 있지만 버블차트를 이용하면 세 가지 이상 요소의 상관관계를 표현할 수 있다 (by 버블 크기 + 색상, 농도 등) , 원의 면적으로 해석
 
 <p style="text-align: center;">
-<img width="830" alt="스크린샷 2024-07-27 오후 10 53 26" src="https://github.com/user-attachments/assets/04f6067a-048f-4204-ae5b-bc6b030c694c">
-<img width="833" alt="스크린샷 2024-07-27 오후 10 53 31" src="https://github.com/user-attachments/assets/d09580ad-09cc-4d0d-94a8-bf6d320bf1df">
+<img width="833" alt="스크린샷 2024-07-27 오후 10 53 31" src="https://github.com/user-attachments/assets/e320e158-155a-4df4-b9e5-78c39f57e81e">
+<img width="830" alt="스크린샷 2024-07-27 오후 10 53 26" src="https://github.com/user-attachments/assets/829c7785-c017-4564-af5a-
 </p>
   
 ### * 관계 시각화 실습
@@ -444,7 +441,7 @@ ________________________________________________________________________________
   **그러한 점에서 거시적에서 미시적으로 진행되는 분석 방향과 같이 스토리라인을 잡고 시각화를 적용하는 것이 좋다**  
 
 <p style="text-align: center;">
-<img width="566" alt="스크린샷 2024-07-27 오후 11 16 34" src="https://github.com/user-attachments/assets/c5c16503-6b88-4d5b-9845-eaa84d47a8f2">
+<img width="566" alt="스크린샷 2024-07-27 오후 11 16 34" src="https://github.com/user-attachments/assets/18da1db3-b252-4e4b-b1f2-65b598f6fefe">
 </p>
   
 ### * 공간 시각화 실습
