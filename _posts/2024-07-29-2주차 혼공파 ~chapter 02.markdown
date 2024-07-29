@@ -51,8 +51,11 @@ plt.xlabel("length")
 plt.ylabel("weight")
 plt.show()
 
-<img width="1014" alt="스크린샷 2024-07-29 오후 3 05 21" src="https://github.com/user-attachments/assets/5a8391ba-ac4c-4e78-83a6-4dde95d168d2">
 ```
+결과 : <img width="1014" alt="스크린샷 2024-07-29 오후 3 05 21" src="https://github.com/user-attachments/assets/5a8391ba-ac4c-4e78-83a6-4dde95d168d2">
+
+
+
 
 첫 번째 머신러닝 프로그램
 도미와 빙어 분류
