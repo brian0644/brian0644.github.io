@@ -159,12 +159,14 @@ kn.predict(test_input)                 # 테스트용 데이터로 예측 했을
 4. fit()에 훈련용 데이터, 타깃을 넣고 score()에 테스트용 데이터, 타깃을 넣어봄으로써 모델 성능 평가
 
 
+
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ 
 
 ## 2-2 데이터 전처리
 * 넘파이로 데이터 준비하기 : array 함수를 통해 넘파이 배열로 변환하거나, column_stack 함수를 통해 리스트를 나란히 붙여서 데이터 준비
 * 사이킷런으로 훈련 세트와 테스트 세트 나누기 : 앞에서는 shuffle로 섞었지만 사이킷런에는 train_test_split() 함수 존재
-* 각각의 특성값 기준 맞추기 (단위 고려) : 
+* 각각의 특성값 기준 맞추기 (단위 고려) : 무게와 길이는 서로 다른 단위와 범위를 가지고 있기 때문에 이를 맞춰주기 -> 가장 많이 쓰는게 정규화(표준화)
+<img width="483" alt="스크린샷 2024-07-30 오후 2 13 33" src="https://github.com/user-attachments/assets/dbb0a9cc-d12c-4ab9-9bb1-7b4a9f8f03c4">
 <br>
 
 ```python
@@ -185,19 +187,48 @@ train_input, test_input, train_target, test_target = train_test_split(fish_data,
                                                                                                                                      # random_state=42는 이전 seed와 마찬가지로 해당 랜덤 셋업 저장
                                                                                                                                      # print(train_input.shape, test_input.shape)과 print(train_target.shape, test_target.shape) 를 통해 데이터 개수 및 특성 개수 확인
 
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neighbors import KNeighborsClassifier             # 모델 생성
 kn = KNeighborsClassifier()
 kn.fit(train_input, train_target)
 kn.score(test_input, test_target)
+
+plt.scatter(train_input[:,0], train_input[:,1])                # 산점도 시각화
+plt.scatter(25, 150, marker='^')
+plt.scatter(train_input[indexes,0], train_input[indexes,1], marker='D')
+plt.xlabel('length')
+plt.ylabel('weight')
+plt.show()
+
+plt.scatter(train_input[:,0], train_input[:,1])                # xlim함수로 x축 범위 맞춰주기
+plt.scatter(25, 150, marker='^')
+plt.scatter(train_input[indexes,0], train_input[indexes,1], marker='D')
+plt.xlim((0, 1000))
+plt.xlabel('length')
+plt.ylabel('weight')
+plt.show()
+
+mean = np.mean(train_input, axis=0)                            # 정규화 기본작업
+std = np.std(train_input, axis=0)
+train_scaled = (train_input - mean) / std                      # 정규화(브로드캐스팅)
+
+new = ([25, 150] - mean) / std
+plt.scatter(train_scaled[:,0], train_scaled[:,1])              # 전처리된 데이터 시각화, 모델 훈련
+plt.scatter(new[0], new[1], marker='^')
+plt.xlabel('length')
+plt.ylabel('weight')
+plt.show()
+kn.fit(train_scaled, train_target)
+test_scaled = (test_input - mean) / std                        # 훈련세트의 평균과 표준편차로 정규화 해주기 -> 그렇지 않으면 데이터의 스케일이 같아지지 않으므로 훈련한 모델이 쓸모없어짐
+
 ```
 
+**정리하자면**<br>
+1. 1차원 리스트를 column_stack으로 나란히 인덱스에 맞춰서 붙이기 -> 넘파이 2차원 배열로 생성
+2. 훈련세트와 테스트 세트를 train_test_split함수와 stratify=를 통해 원래 타깃 정답 비율과 맞춰서 나눠주기
+3. 평균 표준편차를 구하고 정규화 해주기 -> 테스트 세트는 훈련세트 평균과 표준편차에 맞춰서 스케일 조정해주기
+4. 모델 학습시키기 (fit)
 
 
-
-수상한 도미 한 마리
-기준을 맞춰라
-전처리 데이터로 모델 훈련하기
-스케일이 다른 특성 처리##
 
 
 
