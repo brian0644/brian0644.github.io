@@ -1,7 +1,0 @@
----
-layout: post
-title:  "ML 2주차 예제"
-date:   2024-07-29 14:00 +09:00
-categories: khuda ML session
----
-
