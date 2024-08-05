@@ -155,10 +155,13 @@ train_input, test_input, train_target, test_target = train_test_split(perch_full
 
 from sklearn.preprocessing import PolynomialFeatures    # PolynomialFeatures 클래스 임포트
 
-poly = PolynomialFeatures()
-poly.fit([[2,3]])                # fit() 메서드를 통해 새롭게 만들 특성 조합을 찾고 (타깃 데이터 필요 없음)
-print(poly.transform([[2,3]]))   # transform() 메서드를 통해 실제 데이터로 변환 (2,3,2제곱,3제곱,2x3 생성)
+poly = PolynomialFeatures(include_bias=False)           
+poly.fit(train_input)                                   # train_input 데이터를 사용하여 다항식 특성 변환을 위한 모델을 학습. 여기서 fit 메서드는 주어진 데이터의 특성의 범위와 다항식 변환에 필요한 정보를 학습
+train_poly = poly.transform(train_input)                # train_input 데이터를 다항식 특성으로 변환. 이 메서드는 train_input에 있는 각 특성의 다항식 조합을 생성하여 새로운 특성 행렬을 생성.
+print(train_poly.shape)                                 # 데이터는 42개, 특성은 9개인것을 확인가능
 
+name=poly.get_feature_names_out()
+print(name)
 
 ```
 
