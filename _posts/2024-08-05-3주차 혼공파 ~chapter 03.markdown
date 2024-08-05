@@ -188,6 +188,7 @@ ss.fit(train_poly)
 train_scaled = ss.transform(train_poly)
 test_scaled = ss.transform(test_poly)
 
+*---------------------------------------------------------------------------------------------------------------------------------------*
 
 from sklearn.linear_model import Ridge                  # 릿지 모델 임포트
 ridge.fit(train_scaled, train_target)
@@ -214,15 +215,42 @@ ridge.fit(train_scaled, train_target)
 print(ridge.score(train_scaled, train_target))
 print(ridge.score(test_scaled, test_target))
 
+*---------------------------------------------------------------------------------------------------------------------------------------*
+
+lasso = Lasso()                                  # 이번엔 라쏘 모델 생성
+lasso.fit(train_scaled, train_target)
+print(lasso.score(train_scaled, train_target))
+print(lasso.score(test_scaled, test_target))
+
+train_score = []
+test_score = []
+alpha_list = [0.001, 0.01, 0.1, 1, 10, 100]
+
+for alpha in alpha_list:
+       lasso = Lasso(alpha=alpha)                # 라쏘 모델 생성
+       lasso.fit(train_scaled, train_target)     # 라쏘 모델 훈련
+       train_score.append(lasso.score(train_scaled, train_target)) # 훈련 점수
+       test_score.append(lasso.score(test_scaled, test_target))    # 테스트 점수 저장
+
+plt.plot(np.log10(alpha_list), train_score)
+plt.plot(np.log10(alpha_list), test_score)
+plt.show()                                       # 적정 alpha 값 확인 -> 10
+
+lasso = Lasso(alpha=10)
+lasso.fit(train_scaled,train_target)
+print(lasso.score(train_scaled,train_target))
+print(lasso.score(test_scaled,test_target))
+
+print(np.sum(lasso.coef_ == 0))                  # 라쏘 모델에서 몇개의 계수가 0이 되었는지 확인 가능 -> 주입된 특성 중 실제로 사용된 특성 개수 헤아리기
 
 ```
 
 **정리하자면**<br>
-1. 1차원 리스트를 column_stack으로 나란히 인덱스에 맞춰서 붙이기 -> 넘파이 2차원 배열로 생성
-2. 훈련세트와 테스트 세트를 train_test_split함수와 stratify=를 통해 원래 타깃 정답 비율과 맞춰서 나눠주기
-3. 평균 표준편차를 구하고 정규화 해주기 -> 테스트 세트는 훈련세트 평균과 표준편차에 맞춰서 스케일 조정해주기
-4. 모델 학습시키기 (fit)
-
+1. 일반적인 선형회귀에서는 모델의 복잡성이 낮다는 문제가 있었음 -> 다중 회귀 필요
+2. 판다스를 통해 여러 특성을 csv로 받아오고 이를 넘파이 배열로 변환하면 데이터와 타깃 준비 완료
+3. poly = PolynomialFeatures(include_bias=False), poly.fit으로 우선 데이터 학습시키고 poly.transform으로 새로운 특성 생성(특성공학)
+4. 특성이 많아지면 복잡성은 증가하나 그만큼 훈련 세트에 대한 과대적합 발생  -> 규제 필요 (릿지, 라쏘)
+5. 릿지 라쏘 각각의 하이퍼파라미터인 alpha의 적정값을 찾고자 수시로 변경해보면서 훈련세트와 테스트 세트의 값 차이 확인 
 
 
 
