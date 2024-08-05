@@ -1,0 +1,198 @@
+---
+layout: post
+title:  "ML 3주차 정리"
+date:   2024-08-05 16:53 +09:00
+categories: khuda ML session
+---
+# **3. 회귀 알고지름과 모델 규제**
+## 3-1. K-최근접 이웃 회귀
+ * 지도학습은 회귀와 분류로 나뉜다. 분류는 어느 집단인지(도미, 빙어)를 분류하는 것, 예측은 임의의 어떤 숫자를 예측하는 문제 -> 연속형 변수와 범주형 변수
+ * 결정계수 : 분류의 경우 테스 세트에 있는 샘픙를 정확하게 분류한 개수의 비율, 그러나 회귀에서는 정확하게 숫자를 맞힌다는 것은 불가능 -> 결정계수를 통해 평가, 높을수록 좋음
+  
+  
+### KNN 회귀
+  특정 특성을 예측하기 위해 근접하는 k개의 데이터를 살펴보고 예측하는법. 주로 주변 값들의 평균값으로 계산
+ 
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+perch_length = np.array([8.4, 13.7, 15.0, 16.2, 17.4, 18.0, 18.7, 19.0, 19.6, 20.0, 21.0,
+       21.0, 21.0, 21.3, 22.0, 22.0, 22.0, 22.0, 22.0, 22.5, 22.5, 22.7,
+       23.0, 23.5, 24.0, 24.0, 24.6, 25.0, 25.6, 26.5, 27.3, 27.5, 27.5,
+       27.5, 28.0, 28.7, 30.0, 32.8, 34.5, 35.0, 36.5, 36.0, 37.0, 37.0,
+       39.0, 39.0, 39.0, 40.0, 40.0, 40.0, 40.0, 42.0, 43.0, 43.0, 43.5,
+       44.0])
+perch_weight = np.array([5.9, 32.0, 40.0, 51.5, 70.0, 100.0, 78.0, 80.0, 85.0, 85.0, 110.0,
+       115.0, 125.0, 130.0, 120.0, 120.0, 130.0, 135.0, 110.0, 130.0,
+       150.0, 145.0, 150.0, 170.0, 225.0, 145.0, 188.0, 180.0, 197.0,
+       218.0, 300.0, 260.0, 265.0, 250.0, 250.0, 300.0, 320.0, 514.0,
+       556.0, 840.0, 685.0, 700.0, 700.0, 690.0, 900.0, 650.0, 820.0,
+       850.0, 900.0, 1015.0, 820.0, 1100.0, 1000.0, 1100.0, 1000.0,
+       1000.0])
+
+plt.scatter(perch_length, perch_weight)
+plt.xlabel('length')
+plt.ylabel('weight')
+plt.show()
+import matplotlib.pyplot as plt
+plt.scatter(perch_length, perch_weight)              # 산점도를 통해 길이와 무게의 관계 파악
+
+
+
+from sklearn.model_selection import train_test_split
+train_input, test_input, train_target, test_target = train_test_split(perch_length, perch_weight, random_state=42) # 길이라는 데이터 대한 타깃을 무게로 잡은것
+# 현재 훈련세트는 길이로, 1차원 배열에 해당 -> 2차원 배열로 수정할 필요
+
+train_input = train_input.reshape(-1, 1)                       # 1차원 훈련 세트를 2차원으로 확장
+test_input = test_input.reshape(-1, 1)                         # 1차원 테스트 세트를 2차원으로 확장
+
+
+from sklearn.neighbors import KNeighborsRegressor              # 최근접 이웃 회귀 알고리즘 임포트
+knr = KNeighborsRegressor()                                    # 모델생성
+knr.fit(train_input, train_target)                             # 학습
+
+test_predict = knr.predict(test_input)                         # 테스트 세트에 대한 예측 
+mae = mean_absolute_error(test_target, test_predict)           # 테스트 세트에 대한 평균 절댓값 오차 계산 
+print(mae)
+
+
+print(knr.score(test_input, test_target))           
+print(knr.score(train_input, train_target))                    # 두 값을 비교하면서 모델이 훈련세트에 대해 과대적합 됐는지 과소적합 됐는지 확인 -> 테스트 점수가 더 높거나 둘다 낮으면 과소, 훈련 점수가 더 높으면 과대적합
+```
+
+ **결과 : 테스트 세트의 점수가 더 높기 때문에 과소적합 -> 모델을 더 복잡하게 만들 필요가 있음 -> k의 수를 줄이는 것(훈련 세트에 있는 패턴에 민감해짐 = 약간 과대적합되도록)**
+   
+```python
+knr.n_neighbors = 3                                            # k값 축소 후 결정계수 값 비교
+knr.fit(train_input, train_target)
+print(knr.score(train_input, train_target))
+print(knr.score(test_input, test_target))
+```
+
+**정리하자면**<br>
+1. 데이터를 2차원 배열로 준비하기 (1차원 두개를 합쳐서 훈련 및 테스트로 쓰는 것이 아닌 1차원 2개에서 1개는 데이터, 1개는 타깃으로 쓰이므로 일차원 배열 두개를 각각 2차원으로 확장 by reshape)
+2. kn = KNeighborsRegressor()으로 학습모델 생성 후 kn.fit(데이터, 정답)로 학습
+3. kn.score(데이터, 정답)으로 학습 잘 되었는지 확인 -> 훈련 데이터 훈련 타깃에 대한 값, 테스트 데이터 테스트 타깃에 대한 값 비교로 과대적합 과소적합 여부 판단
+4. 과소적합이라면 모델을 더 복잡하게 -> k 개수 줄이기 //  과대적합이라면 k를 늘리는 방법도 가능 (별도로 mae = mean_absolute_error(test_target, test_predict)를 통해 오차 절댓값 계산)
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ 
+
+## 3-2 선형 회귀
+* 지도학습 : 데이터(input)과 정답(target)을 둘다 학습시키는 것. 타깃이 있으니 정답을 맞히는 모델 생성
+* 비지도학습 : 데이터(input)만 학습 시키는 것. 무언가를 맞힐 수는 없지만 데이터를 잘 파악하거나 변형하는 데 도움을 줌
+* 훈련 세트 : 훈련에 사용되는 데이터
+* 테스트 세트 : 테스트에 사용되는 데이터
+* 샘플링 편향 : 데이터를 훈련 세트와 테스트 세트로 나누는 과정에서 샘플들이 골고루 섞이지 않은 경우
+* 넘파이 : 배열 라이브러리, 파이썬의 리스트로 2차원 리스트를 표현할 수 있지만 고차원 리스트를 표현하기 위해 필요함
+  
+<br>
+
+```python
+input_arr = np.array(fish_data)    # 데이터를 넘파이 배열로 변환
+target_arr = np.array(fish_target) # 정답을 넘파이 배열로 변환
+                                   # print(input_arr.shape = 샘플 수, 특성 수)
+
+np.random.seed(42)
+index = np.arange(49)               # 넘파이 arange() -> 0부터 48까지 1씩 증가하는 인덱스 생성
+np.random.shuffle(index)            # 인덱스를 랜덤하게 섞기
+                                    # print(input_arr[[1,3]]) -> 배열 인덱싱 기능으로 1개의 인덱스가 아닌 여러개의 인덱스로 한 번에 여러개의 원소 선택
+train_input = input_arr[index[:35]]     # 무작위로 선택된 인덱스 35개를 훈련용 데이터로 선택
+train_target = target_arr[index[:35]]   # 무작위로 선택된 인덱스 35개를 훈련용 타깃으로 선택
+test_input = input_arr[index[35:]]      # 무작위로 선택된 인덱스 14개를 테스트용 데이터로 선택
+test_target = target_arr[index[35:]]    # 무작위로 선택된 인덱스 14개를 테스트용 데이터로 선택
+
+kn = KNeighborsClassifier()
+kn = kn.fit(train_input, train_target) # 훈련용 데이터와 타깃으로 모델 학습
+kn.score(test_input, test_target)      # 테스트용 데이터와 타깃으로 모델 평가
+kn.predict(test_input)                 # 테스트용 데이터로 예측 했을 때 test_target과 일치 하는것을 확인 가능
+
+```
+
+**정리하자면**<br>
+1. 2차원 배열 데이터를 넘파이 array()함수를 통해 넘파이 배열로 변환
+2. seed()를 통해 난수를 생성하기 위한 정수 초깃값 지정 후 49개의 인덱스 생성, shuffle()을 통해 주어진 배열을 랜덤하게 섞기
+3. 훈련용 데이터, 타깃과 테스트용 데이터, 타깃으로 구분
+4. fit()에 훈련용 데이터, 타깃을 넣고 score()에 테스트용 데이터, 타깃을 넣어봄으로써 모델 성능 평가
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ 
+
+## 2-2 데이터 전처리
+* 넘파이로 데이터 준비하기 : array 함수를 통해 넘파이 배열로 변환하거나, column_stack 함수를 통해 리스트를 나란히 붙여서 데이터 준비
+* 사이킷런으로 훈련 세트와 테스트 세트 나누기 : 앞에서는 shuffle로 섞었지만 사이킷런에는 train_test_split() 함수 존재
+* 각각의 특성값 기준 맞추기 (단위 고려) : 무게와 길이는 서로 다른 단위와 범위를 가지고 있기 때문에 이를 맞춰주기 -> 가장 많이 쓰는게 정규화(표준화)
+<img width="483" alt="스크린샷 2024-07-30 오후 2 13 33" src="https://github.com/user-attachments/assets/dbb0a9cc-d12c-4ab9-9bb1-7b4a9f8f03c4">
+<br>
+
+```python
+fish_length = [25.4, 26.3, 26.5, 29.0, 29.0, 29.7, 29.7, 30.0, 30.0, 30.7, 31.0, 31.0, 
+                31.5, 32.0, 32.0, 32.0, 33.0, 33.0, 33.5, 33.5, 34.0, 34.0, 34.5, 35.0, 
+                35.0, 35.0, 35.0, 36.0, 36.0, 37.0, 38.5, 38.5, 39.5, 41.0, 41.0, 9.8, 
+                10.5, 10.6, 11.0, 11.2, 11.3, 11.8, 11.8, 12.0, 12.2, 12.4, 13.0, 14.3, 15.0]
+fish_weight = [242.0, 290.0, 340.0, 363.0, 430.0, 450.0, 500.0, 390.0, 450.0, 500.0, 475.0, 500.0, 
+                500.0, 340.0, 600.0, 600.0, 700.0, 700.0, 610.0, 650.0, 575.0, 685.0, 620.0, 680.0, 
+                700.0, 725.0, 720.0, 714.0, 850.0, 1000.0, 920.0, 955.0, 925.0, 975.0, 950.0, 6.7, 
+                7.5, 7.0, 9.7, 9.8, 8.7, 10.0, 9.9, 9.8, 12.2, 13.4, 12.2, 19.7, 19.9]  # 현재 길이 데이터와 무게 데이터가 각각 1차원 리스트로 나뉘어있는 상태 -> column_stack 함수를 통해 나란히 붙여서 2차원 배열로 만드는 과정 필요
+
+fish_data = np.column_stack((fish_lengh, fish_weight))       
+fish_target = np.concatenate((np.ones(35), np.zeros(14))) # 임의의 타깃 생성, 리스트 뒤로 나란히 붙이기
+
+from sklearn.modlel_selection import train_test_split     # 훈련용, 테스트용 세트 나누기 위한 함수 임포트
+train_input, test_input, train_target, test_target = train_test_split(fish_data, fish_target, stratify=fish_target, random_state=42) # stratify=fish_target을 통해 원래 타깃 값 도미 35마리 빙어 14마리 비율에 맞도록 훈련용과 테스트용에 분배
+                                                                                                                                     # random_state=42는 이전 seed와 마찬가지로 해당 랜덤 셋업 저장
+                                                                                                                                     # print(train_input.shape, test_input.shape)과 print(train_target.shape, test_target.shape) 를 통해 데이터 개수 및 특성 개수 확인
+
+from sklearn.neighbors import KNeighborsClassifier             # 모델 생성
+kn = KNeighborsClassifier()
+kn.fit(train_input, train_target)
+kn.score(test_input, test_target)
+
+plt.scatter(train_input[:,0], train_input[:,1])                # 산점도 시각화
+plt.scatter(25, 150, marker='^')
+plt.scatter(train_input[indexes,0], train_input[indexes,1], marker='D')
+plt.xlabel('length')
+plt.ylabel('weight')
+plt.show()
+
+plt.scatter(train_input[:,0], train_input[:,1])                # xlim함수로 x축 범위 맞춰주기
+plt.scatter(25, 150, marker='^')
+plt.scatter(train_input[indexes,0], train_input[indexes,1], marker='D')
+plt.xlim((0, 1000))
+plt.xlabel('length')
+plt.ylabel('weight')
+plt.show()
+
+mean = np.mean(train_input, axis=0)                            # 정규화 기본작업
+std = np.std(train_input, axis=0)
+train_scaled = (train_input - mean) / std                      # 정규화(브로드캐스팅)
+
+new = ([25, 150] - mean) / std
+plt.scatter(train_scaled[:,0], train_scaled[:,1])              # 전처리된 데이터 시각화, 모델 훈련
+plt.scatter(new[0], new[1], marker='^')
+plt.xlabel('length')
+plt.ylabel('weight')
+plt.show()
+kn.fit(train_scaled, train_target)
+test_scaled = (test_input - mean) / std                        # 훈련세트의 평균과 표준편차로 정규화 해주기 -> 그렇지 않으면 데이터의 스케일이 같아지지 않으므로 훈련한 모델이 쓸모없어짐
+
+```
+
+**정리하자면**<br>
+1. 1차원 리스트를 column_stack으로 나란히 인덱스에 맞춰서 붙이기 -> 넘파이 2차원 배열로 생성
+2. 훈련세트와 테스트 세트를 train_test_split함수와 stratify=를 통해 원래 타깃 정답 비율과 맞춰서 나눠주기
+3. 평균 표준편차를 구하고 정규화 해주기 -> 테스트 세트는 훈련세트 평균과 표준편차에 맞춰서 스케일 조정해주기
+4. 모델 학습시키기 (fit)
+
+
+
+
+
+
+
+
+
+
