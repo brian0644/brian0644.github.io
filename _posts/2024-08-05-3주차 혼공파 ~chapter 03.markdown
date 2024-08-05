@@ -81,103 +81,84 @@ print(knr.score(test_input, test_target))
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ 
 
 ## 3-2 선형 회귀
-* 지도학습 : 데이터(input)과 정답(target)을 둘다 학습시키는 것. 타깃이 있으니 정답을 맞히는 모델 생성
-* 비지도학습 : 데이터(input)만 학습 시키는 것. 무언가를 맞힐 수는 없지만 데이터를 잘 파악하거나 변형하는 데 도움을 줌
-* 훈련 세트 : 훈련에 사용되는 데이터
-* 테스트 세트 : 테스트에 사용되는 데이터
-* 샘플링 편향 : 데이터를 훈련 세트와 테스트 세트로 나누는 과정에서 샘플들이 골고루 섞이지 않은 경우
-* 넘파이 : 배열 라이브러리, 파이썬의 리스트로 2차원 리스트를 표현할 수 있지만 고차원 리스트를 표현하기 위해 필요함
-  
+* knn의 한계 : 해당 산점도를 보면 길이가 커질수록 무게가 증가하는 경향이 있지만 knn은 그저 주변 데이터들의 평균값을 계산할 뿐 -> 오류 발생
+* 선형회귀 : 모델의 특성을 가장 잘 표현하는 직선을 토대로 예측하는 알고리즘
+
+<img width="240" alt="스크린샷 2024-08-05 오후 6 04 58" src="https://github.com/user-attachments/assets/c8d33e94-dfdd-4430-b638-931620f8b262">
+<img width="222" alt="스크린샷 2024-08-05 오후 6 08 50" src="https://github.com/user-attachments/assets/5574f80e-8fb4-4662-888f-9fee09bd7e5a">
+
 <br>
 
 ```python
-input_arr = np.array(fish_data)    # 데이터를 넘파이 배열로 변환
-target_arr = np.array(fish_target) # 정답을 넘파이 배열로 변환
-                                   # print(input_arr.shape = 샘플 수, 특성 수)
+from sklearn.linear_model import LinearRegression
 
-np.random.seed(42)
-index = np.arange(49)               # 넘파이 arange() -> 0부터 48까지 1씩 증가하는 인덱스 생성
-np.random.shuffle(index)            # 인덱스를 랜덤하게 섞기
-                                    # print(input_arr[[1,3]]) -> 배열 인덱싱 기능으로 1개의 인덱스가 아닌 여러개의 인덱스로 한 번에 여러개의 원소 선택
-train_input = input_arr[index[:35]]     # 무작위로 선택된 인덱스 35개를 훈련용 데이터로 선택
-train_target = target_arr[index[:35]]   # 무작위로 선택된 인덱스 35개를 훈련용 타깃으로 선택
-test_input = input_arr[index[35:]]      # 무작위로 선택된 인덱스 14개를 테스트용 데이터로 선택
-test_target = target_arr[index[35:]]    # 무작위로 선택된 인덱스 14개를 테스트용 데이터로 선택
+lr = LinearRegression()                                        # 선형 회귀 모델 생성
+lr.fit(train_input, train_target)                              # 모델 학습  
+print(lr.predict([[50]]))                                      # 이전 길이 50에 대한 무게 예측
+print(lr.coef_, lr.intercept_)                                 # coef는 기울기, 가중치라고도 불림, 기울기와 y절편값 확인
 
-kn = KNeighborsClassifier()
-kn = kn.fit(train_input, train_target) # 훈련용 데이터와 타깃으로 모델 학습
-kn.score(test_input, test_target)      # 테스트용 데이터와 타깃으로 모델 평가
-kn.predict(test_input)                 # 테스트용 데이터로 예측 했을 때 test_target과 일치 하는것을 확인 가능
+plt.scatter(train_input, train_target)
+plt.plot([15,50], [15*lr.coef_+lr.intercept_, 50*lr.coef_+lr.intercept_])   # 직선 그리기
+plt.scatter(50,1241.8, marker='^')
 
+
+print(lr.score(train_input, train_target))                     # 훈련세트와 테스트 세트의 결정계수 값 확인으로 과대적합 과소적합 확인 -> 두 값 모두 작아서 과소적합
+print(lr.score(test_input, test_target))
 ```
 
+ **결과 : 훈련 세트와 테스트 세트에 대한 결정 계수 값 둘다 낮음 -> 산점도를 보니 사실 직선보다 최소 2차함수가 필요함을 확인 가능 -> 데이터들도 제곱해줄 필요 있음**
+
+ ```python
+train_poly = np.column_stack((train_input **2, train_input))  # 데이터에 제곱을 한 열과 원본 데이터 두개를 2차원으로 붙이기
+test_poly = np.column_stack((test_input **2, test_input))
+
+lr_2 = LinearRegression()
+lr_2.fit(train_poly, train_target)                            # 단, 타깃은 그대로 사용해야함, 목표하는 값은 어떤 그래프를 훈련하든지 바꿀 필요가 없다. -> 2차식부터는 다항회귀
+
+point = np.arange(15, 50)                                     # 그래프 그리기
+plt.scatter(train_input, train_target)
+plt.plot(point, 1.01*point**2 - 21.6*point + 116.05)
+plt.scatter([50],[1574], marker='^')
+
+```
 **정리하자면**<br>
-1. 2차원 배열 데이터를 넘파이 array()함수를 통해 넘파이 배열로 변환
-2. seed()를 통해 난수를 생성하기 위한 정수 초깃값 지정 후 49개의 인덱스 생성, shuffle()을 통해 주어진 배열을 랜덤하게 섞기
-3. 훈련용 데이터, 타깃과 테스트용 데이터, 타깃으로 구분
-4. fit()에 훈련용 데이터, 타깃을 넣고 score()에 테스트용 데이터, 타깃을 넣어봄으로써 모델 성능 평가
-
-
+1. knn 회귀는 아무리 멀리 떨어져 있더라도 무조건 가장 가까운 샘플의 타깃을 평균하여 예측 -> 그 대안으로 나온 것이 선형회귀와 다항회귀
+2. LinearRegression()를 통해 모델 생성, 학습 // 2차 이상으로 그리고 싶다면 column_stack을 통해 데이터 제곱한 것 넣기
+3. coef_, intercept_ (모델 파라미터) 를 통해 기울기와 y절편 확인 후 그래프화
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ 
 
-## 2-2 데이터 전처리
-* 넘파이로 데이터 준비하기 : array 함수를 통해 넘파이 배열로 변환하거나, column_stack 함수를 통해 리스트를 나란히 붙여서 데이터 준비
-* 사이킷런으로 훈련 세트와 테스트 세트 나누기 : 앞에서는 shuffle로 섞었지만 사이킷런에는 train_test_split() 함수 존재
-* 각각의 특성값 기준 맞추기 (단위 고려) : 무게와 길이는 서로 다른 단위와 범위를 가지고 있기 때문에 이를 맞춰주기 -> 가장 많이 쓰는게 정규화(표준화)
-<img width="483" alt="스크린샷 2024-07-30 오후 2 13 33" src="https://github.com/user-attachments/assets/dbb0a9cc-d12c-4ab9-9bb1-7b4a9f8f03c4">
-<br>
+## 3-3 특성 공학과 규제
+* 다중 회귀 : 특성이 1개라면 직선의 모습, 2개의 특성이라면 평면의 모습 -> 특성이 늘어날 수록 매우 복잡한 모델 표현 가능 -> 기존 길이 뿐만 아니라 높이, 두께, 길이x높이 등 새로운 특성 생성 (특성공학)
+* 판다스 : 데이터 분석 라이브러레 -> 데이터프레임을 통해 다차원 배열을 다룰 수 있게 해주며 데이터 프레임은 넘파이 배열로도 쉽게 바꿀 수 있음
+* 사이킷런의 변환기 : 특성을 만들거나 전처리를 하기 위한 다양한 클래스를 제공, 이들을 "변환기"라고 부름. fit(),transform() 등의 메서드 제공
 
 ```python
-fish_length = [25.4, 26.3, 26.5, 29.0, 29.0, 29.7, 29.7, 30.0, 30.0, 30.7, 31.0, 31.0, 
-                31.5, 32.0, 32.0, 32.0, 33.0, 33.0, 33.5, 33.5, 34.0, 34.0, 34.5, 35.0, 
-                35.0, 35.0, 35.0, 36.0, 36.0, 37.0, 38.5, 38.5, 39.5, 41.0, 41.0, 9.8, 
-                10.5, 10.6, 11.0, 11.2, 11.3, 11.8, 11.8, 12.0, 12.2, 12.4, 13.0, 14.3, 15.0]
-fish_weight = [242.0, 290.0, 340.0, 363.0, 430.0, 450.0, 500.0, 390.0, 450.0, 500.0, 475.0, 500.0, 
-                500.0, 340.0, 600.0, 600.0, 700.0, 700.0, 610.0, 650.0, 575.0, 685.0, 620.0, 680.0, 
-                700.0, 725.0, 720.0, 714.0, 850.0, 1000.0, 920.0, 955.0, 925.0, 975.0, 950.0, 6.7, 
-                7.5, 7.0, 9.7, 9.8, 8.7, 10.0, 9.9, 9.8, 12.2, 13.4, 12.2, 19.7, 19.9]  # 현재 길이 데이터와 무게 데이터가 각각 1차원 리스트로 나뉘어있는 상태 -> column_stack 함수를 통해 나란히 붙여서 2차원 배열로 만드는 과정 필요
+import pandas as pd
+import ssl
 
-fish_data = np.column_stack((fish_lengh, fish_weight))       
-fish_target = np.concatenate((np.ones(35), np.zeros(14))) # 임의의 타깃 생성, 리스트 뒤로 나란히 붙이기
+ssl._create_default_https_context = ssl._create_unverified_context
+df = pd.read_csv("https://bit.ly/perch_csv")
 
-from sklearn.modlel_selection import train_test_split     # 훈련용, 테스트용 세트 나누기 위한 함수 임포트
-train_input, test_input, train_target, test_target = train_test_split(fish_data, fish_target, stratify=fish_target, random_state=42) # stratify=fish_target을 통해 원래 타깃 값 도미 35마리 빙어 14마리 비율에 맞도록 훈련용과 테스트용에 분배
-                                                                                                                                     # random_state=42는 이전 seed와 마찬가지로 해당 랜덤 셋업 저장
-                                                                                                                                     # print(train_input.shape, test_input.shape)과 print(train_target.shape, test_target.shape) 를 통해 데이터 개수 및 특성 개수 확인
+perch_full = df.to_numpy()          # 데이터를 판다스를 통해 데이터프레임으로 불러오고 넘파이배열로 변환
 
-from sklearn.neighbors import KNeighborsClassifier             # 모델 생성
-kn = KNeighborsClassifier()
-kn.fit(train_input, train_target)
-kn.score(test_input, test_target)
 
-plt.scatter(train_input[:,0], train_input[:,1])                # 산점도 시각화
-plt.scatter(25, 150, marker='^')
-plt.scatter(train_input[indexes,0], train_input[indexes,1], marker='D')
-plt.xlabel('length')
-plt.ylabel('weight')
-plt.show()
+perch_weight = np.array([5.9, 32.0, 40.0, 51.5, 70.0, 100.0, 78.0, 80.0, 85.0, 85.0, 110.0,
+       115.0, 125.0, 130.0, 120.0, 120.0, 130.0, 135.0, 110.0, 130.0,
+       150.0, 145.0, 150.0, 170.0, 225.0, 145.0, 188.0, 180.0, 197.0,
+       218.0, 300.0, 260.0, 265.0, 250.0, 250.0, 300.0, 320.0, 514.0,
+       556.0, 840.0, 685.0, 700.0, 700.0, 690.0, 900.0, 650.0, 820.0,
+       850.0, 900.0, 1015.0, 820.0, 1100.0, 1000.0, 1100.0, 1000.0,
+       1000.0])                     # 타깃 데이터 준비
 
-plt.scatter(train_input[:,0], train_input[:,1])                # xlim함수로 x축 범위 맞춰주기
-plt.scatter(25, 150, marker='^')
-plt.scatter(train_input[indexes,0], train_input[indexes,1], marker='D')
-plt.xlim((0, 1000))
-plt.xlabel('length')
-plt.ylabel('weight')
-plt.show()
+train_input, test_input, train_target, test_target = train_test_split(perch_full, perch_weight, random_state=42) # 훈련용과 테스트용으로 분리
 
-mean = np.mean(train_input, axis=0)                            # 정규화 기본작업
-std = np.std(train_input, axis=0)
-train_scaled = (train_input - mean) / std                      # 정규화(브로드캐스팅)
+from sklearn.preprocessing import PolynomialFeatures    # PolynomialFeatures 클래스 임포트
 
-new = ([25, 150] - mean) / std
-plt.scatter(train_scaled[:,0], train_scaled[:,1])              # 전처리된 데이터 시각화, 모델 훈련
-plt.scatter(new[0], new[1], marker='^')
-plt.xlabel('length')
-plt.ylabel('weight')
-plt.show()
-kn.fit(train_scaled, train_target)
-test_scaled = (test_input - mean) / std                        # 훈련세트의 평균과 표준편차로 정규화 해주기 -> 그렇지 않으면 데이터의 스케일이 같아지지 않으므로 훈련한 모델이 쓸모없어짐
+poly = PolynomialFeatures()
+poly.fit([[2,3]])                # fit() 메서드를 통해 새롭게 만들 특성 조합을 찾고 (타깃 데이터 필요 없음)
+print(poly.transform([[2,3]]))   # transform() 메서드를 통해 실제 데이터로 변환 (2,3,2제곱,3제곱,2x3 생성)
+
 
 ```
 
