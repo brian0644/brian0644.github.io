@@ -12,7 +12,7 @@ categories: khuda ML session
   
 ### KNN 회귀
   특정 특성을 예측하기 위해 근접하는 k개의 데이터를 살펴보고 예측하는법. 주로 주변 값들의 평균값으로 계산
- 
+   
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
@@ -132,6 +132,11 @@ plt.scatter([50],[1574], marker='^')
 * 다중 회귀 : 특성이 1개라면 직선의 모습, 2개의 특성이라면 평면의 모습 -> 특성이 늘어날 수록 매우 복잡한 모델 표현 가능 -> 기존 길이 뿐만 아니라 높이, 두께, 길이x높이 등 새로운 특성 생성 (특성공학)
 * 판다스 : 데이터 분석 라이브러레 -> 데이터프레임을 통해 다차원 배열을 다룰 수 있게 해주며 데이터 프레임은 넘파이 배열로도 쉽게 바꿀 수 있음
 * 사이킷런의 변환기 : 특성을 만들거나 전처리를 하기 위한 다양한 클래스를 제공, 이들을 "변환기"라고 부름. fit(),transform() 등의 메서드 제공
+* 규제 : 모델이 훈련 세트를 너무 과도하게 학습하지 못하도록 훼방하는 것. 과대적합 방지 -> 선형 회귀 모델에 규제를 적용할 때 계수 값의 크기가 서로 많이 다르면 공정하게 제어 불가 -> 정규화 우선 후 규제, 이를 릿지, 라쏘라고 부름
+* 릿지 : 계수를 제곱한 값을 기준으로 규제 적용 -> 일반적으로 선호
+* 라쏘 : 계수의 절댓값을 기준으로 규제 적용 
+
+
 
 ```python
 import pandas as pd
@@ -160,8 +165,55 @@ poly.fit(train_input)                                   # train_input 데이터�
 train_poly = poly.transform(train_input)                # train_input 데이터를 다항식 특성으로 변환. 이 메서드는 train_input에 있는 각 특성의 다항식 조합을 생성하여 새로운 특성 행렬을 생성.
 print(train_poly.shape)                                 # 데이터는 42개, 특성은 9개인것을 확인가능
 
-name=poly.get_feature_names_out()
+name=poly.get_feature_names_out()                       # poly.get_feature_names_out 을 통해 다항 특성 파악
 print(name)
+
+test_poly = poly.transform(test_input)                  # test_input 데이터를 다항식 특성으로 변환. 이 메서드는 test_input에 있는 각 특성의 다항식 조합을 생성하여 새로운 특성 행렬을 생성.
+
+lr=LinearRegression()                                   # 모델 생성
+lr.fit(train_poly, train_target)                        # 다중 특성 훈련 데이터와 타깃 데이터로 학습
+print(lr.score(train_poly, train_target))
+print(lr.score(test_poly, test_target))                 # 훈련 세트와 테스트 세트 결정 계수 비교 -> 과대적합 과소적합 여부 판단
+
+poly = PolynomialFeatures(degree=5, include_bias=False) # 특성을 많이 만들어서 재수행해보면 너무 많아도 과대적합이 발생한 다는 것을 파악 가능
+```
+
+**결과 : 특성이 너무 많아져서 과대적합 발생 -> 규제 적용 필요**
+<img width="604" alt="스크린샷 2024-08-05 오후 7 53 38" src="https://github.com/user-attachments/assets/fbba37d7-5c95-4e28-9ec6-4a10bab42d8a">
+
+
+```python
+ss = StandardScaler()                                   # 이와같은 과대적합을 피하고자 규제 전 정규화
+ss.fit(train_poly)
+train_scaled = ss.transform(train_poly)
+test_scaled = ss.transform(test_poly)
+
+
+from sklearn.linear_model import Ridge                  # 릿지 모델 임포트
+ridge.fit(train_scaled, train_target)
+print(ridge.score(train_scaled, train_target))          # 훈련 세트와 테스트 세트 비교
+print(ridge.score(test_scaled, test_target))            # 릿지와 라쏘 모델을 사용할 때 규제의 양을 임의로 조절 가능. 모델 객체를 만들 때 alpha 매개변수로 규제의 강도 조절(하이퍼 파라미터).
+
+
+train_score = []
+test_score = []
+alpha_list = [0.001, 0.01, 0.1, 1, 10, 100]
+
+for alpha in alpha_list:
+       ridge = Ridge(alpha=alpha)                # 릿지 모델 생성
+       ridge.fit(train_scaled, train_target)     # 릿지 모델 훈련
+       train_score.append(ridge.score(train_scaled, train_target)) # 훈련 점수
+       test_score.append(ridge.score(test_scaled, test_target))    # 테스트 점수 저장   
+
+plt.plot(np.log10(alpha_list), train_score)
+plt.plot(np.log10(alpha_list), test_score)
+plt.show()                                       # 그래프를 통해 적정 alpha 값 찾기
+
+ridge = Ridge(alpha=0.1)                         # 해당 alpha로 릿지 모델 훈련 
+ridge.fit(train_scaled, train_target)
+print(ridge.score(train_scaled, train_target))
+print(ridge.score(test_scaled, test_target))
+
 
 ```
 
