@@ -106,10 +106,80 @@ np.round(proba, decimals=3)
 * 로지스틱 손실 함수 : 이진 분류에서 사용되는 손실 함수, 이진 크로스엔트로피 손실 함수라고도 불림
 * 크로스엔트로피 손실 함수 : 다중 분류에서 사용되는 손실 함수
 * 이밖에도 회귀의 손실함수로는 평균 절댓값 오차 혹은 평균 제곱 오차를 많이 사용한다
+* 에포크가 높으면 과대적합, 너무 낮으면 과소적합이 발생할 수 있다
+
+```python
+import pandas as pd
+fish = pd.read_csv('https://bit.ly/fish_csv')
+
+# 데이터와 타깃 분리
+fish_input = fish[["Weight","Length","Diagonal","Height","Width"]].to_numpy()
+fish_target = fish["Species"].to_numpy()
+
+# 훈련세트와 테스트세트 분리
+from sklearn.model_selection import train_test_split
+train_input, test_input, train_target, test_target = train_test_split(fish_input, fish_target, random_state=42)
+
+# 훈련세트와 테스트세트의 데이터(not 타깃) 정규화
+from sklearn.preprocessing import StandardScaler
+ss = StandardScaler()
+ss.fit(train_input)
+train_scaled = ss.transform(train_input)
+test_scaled = ss.transform(test_input)
 
 
+# 사이킷런의 확률적 경사 하강법 클래스 SGDClassifier 사용
+from sklearn.linear_model import SGDClassifier
 
 
+# 손실 함수는 로지스틱 손실 함수로 지정, 에포크 횟수는 max_iter를 통해 조절
+sc = SGDClassifier(loss = 'log_loss', max_iter = 100, random_state = 42)
+sc.fit(train_scaled, train_target)
+print(sc.score(test_scaled, test_target))
 
 
+# 확률적 경사 하강법은 점진적 학습이 가능. 객체를 다시 만들지 않고 훈련한 모델 sc를 추가로 훈련
+sc.partial_fit(train_input, train_target)
+print(sc.score(test_scaled, test_target))
+
+```
+
+<img width="206" alt="스크린샷 2024-08-11 오후 10 30 39" src="https://github.com/user-attachments/assets/78f84c4f-cb61-447d-b143-0d75b08978f8">
+
+
+**이처럼 에포크의 값에 따라 모델의 과대적합과 과소적합이 발생함 -> 둘의 결정계수 값 차이가 적을때 조기종료**
+
+
+```python
+# 점수 기록용 리스트를 만들어서 조기 종료 시점 포착하기
+import numpy as np  
+sc = SGDClassifier(loss = 'log_loss', max_iter = 100, random_state = 42)
+train_score = []
+test_score = []
+classes = np.unique(train_target)
+
+# 300번의 에포크 돌리기
+for _ in range(0,300):
+    sc.partial_fit(train_scaled, train_target, classes=classes)
+    train_score.append(sc.score(train_scaled, train_target))
+    test_score.append(sc.score(test_scaled, test_target))
+
+# 에포크 횟수에 따른 훈련세트와 테스트 세트 점수 차이 시각화
+import matplotlib.pyplot as plt
+plt.plot(train_score)
+plt.plot(test_score)
+plt.show()
+
+# 에포크 횟수 100회로 잡고 다시 훈련 (tol은 일정 에포크 동안 성능이 향상되지 않으면 더 훈련하지 않고 자동 종료 매개변수, none으로 잡아서 정확히 100회 돌리기)
+sc = SGDClassifier(loss = 'log_loss', max_iter = 100,tol=None, random_state = 42)
+sc.fit(train_scaled, train_target)
+print(sc.score(train_scaled, train_target))
+print(sc.score(test_scaled, test_target))
+
+# loss = 의 기본값인 'hinge'(=서포트 벡터 머신) 사용해보기
+sc = SGDClassifier(loss = 'hinge', max_iter = 100, tol=None, random_state = 42)
+sc.fit(train_scaled, train_target)
+print(sc.score(train_scaled, train_target))
+print(sc.score(test_scaled, test_target))
+```
 
