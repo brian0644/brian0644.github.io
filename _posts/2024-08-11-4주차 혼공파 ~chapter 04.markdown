@@ -71,7 +71,28 @@ np.round(proba, decimals=3)
 print(lr.coef_.shape, lr.intercept_.shape)
 # -> 가중치는 7개 타깃에 대하여 5개의 특성(길이, 무기..)를 조사하였으며 편향도 마찬가지
 # 이것은 각 7개의 타깃에 대하여 계산을 7번 조사한것
-# 다중 분류는 소프트맥스 함ㅅ를 사용하여 7개의 z값을 확률로 변환
+# 다중 분류는 소프트맥스 함수를 사용하여 7개의 z값을 확률로 변환
+```
+
+  
+<img width="453" alt="스크린샷 2024-08-11 오후 4 57 31" src="https://github.com/user-attachments/assets/4bcb343d-307e-4cfd-9580-2db9968f8b8a">
+<img width="428" alt="스크린샷 2024-08-11 오후 4 57 34" src="https://github.com/user-attachments/assets/1c940828-14d2-4cdb-85c7-c950b0d2210b">
+
+
+```python
+# 소프트맥스 함수의 출력값이 어떻게 계산됐는지 z1~z7까지의 값을 구한 다음 소프트맥스 함수를 통해 확률로 바꿔보기
+decisions = lr.decision_function(test_scaled[:5])
+np.round(decisions, decimals=2)
+# 샘플 5개에 대한 타깃 7개 각각의 z값을 계산
+
+
+# 사이파이로도 결과 계산 가능
+from scipy.special import softmax
+proba = softmax(decisions, axis=1)
+np.round(proba, decimals=3)
+
 
 
 ```
+
+
