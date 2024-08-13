@@ -7,7 +7,7 @@ categories: khuda ML session
 
 # 4주차 심화세션 - SGDClassifier loss function
 
-## SGCClassifier의 loss = 
+## SGCClassifier의 loss : 이론
 
 ```python
 SGDClassifier(alpha, average, class_weight, epsilon, eta0, fit_intercept, l1_ratio, 
@@ -17,12 +17,20 @@ SGDClassifier(alpha, average, class_weight, epsilon, eta0, fit_intercept, l1_rat
 
 SGDClassifier란 SGD(확률적 경사 하강법)을 이용한 정규화된 선형 분류 모델이다
 
+ * alpha : 값이 클수록 강력한 규제 설정 (default = 0.0001)
+ * loss : 손실함수 (default = 'hinge')
+ * epsilon : 손실 함수에서 현재 예측과 올바른 레이블 간의 차이가 임계값보다 작으면 무시 (default = 0.1)
+ * penalty : 규제 종류 선택 (default = 'l2', 'l1', 'elasticnet'(l1,l2 섞은거))
+ * l1_ratio : L1 규제의 비율 (Elastic-net에서만 사용 , default = 0.15)
+ * max_iter : 계산에 사용할 작업 수
+
+ 
   
-클래스의 매개변수 중 loss에 들어가는 다양한 손실함수에 대해 살펴보겠다
+>>> 클래스의 매개변수 중 loss에 들어가는 다양한 손실함수에 대해 살펴보겠다
 
   
 loss : 손실함수를 지정한다. 기본값은 "hinge" 로, 서포트 벡터 머신을 사용하는 손실함수이며
-       이밖에도 log_loss, modified_huber, squared_hinge, perceptron, squared_error, huber,epsilon_insensitive, squared_epsilon_insensitive 등이 존재한다.
+       이밖에도 log, modified_huber, squared_hinge, perceptron, squared_error, huber,epsilon_insensitive, squared_epsilon_insensitive 등이 존재한다.
 
        
 ### 손실함수 설명
@@ -44,8 +52,11 @@ loss : 손실함수를 지정한다. 기본값은 "hinge" 로, 서포트 벡터 
 
   
 **장점 : 결정 경계를 명확히 하여 잘못 분류된 데이터 포인트에 대해 큰 벌칙을 부과. 아웃라이어에 덜 민감**
+
+  
 **단점 : 이진분류에 적합하며 다중 분류 시에는 다양한 전략이 추가될 수는 있으나 계산량이 증가할 수 있음. 특성이 많을때 성능 저하 가능성. 스케일이 다른 데이터를 전처리하지않으면 잘못된 결정 경계 도출(like knn 예제)**
 
+  
 #### 2. log
   로그 손실은 로지스틱 회귀에서 사용하는 로지스틱 손실 함수이다. 
   이진분류(시그모이드)와 다중분류(소프트맥스) 상황에서 모델의 예측값과 실제 레이블 간의 로그 손실을 계산하고 손실이 최소화되도록 가중치를 조정하여 모델을 학습시킨다.
@@ -62,7 +73,32 @@ loss : 손실함수를 지정한다. 기본값은 "hinge" 로, 서포트 벡터 
 * 𝑦̂ : 예측된 확률 값
 
 **장점 : 각 타깃에 대한 확률값을 제공하기 때문에 확률적 해석이 가능. 다중 클래스 분류 문제에서도 사용 가능**
+
+  
 **단점 : 잘못된 예측에 대해 큰 패널티를 부과 -> 손실값이 매우 커져 모델에 큰 영향**
 
 
+#### 3. huber, modified_huber
+  우선, 후버 손실은 MSE(평균 제곱 오차)와 MAE(평균 절댓값 오차)를 결합한 함수이다.
+  MSE는 이상치에 제곱을 통해 많은 비중을 주게되는 반면, MAE는 같은 비중을 두게된다. 또한 MSE의 경우 이상치가 아닌 데이터에선 훌륭한 모델을 만들 수 있기에 이 둘을 절충한 것이 후버 손실이다. 주로 회귀 문제에 사용한다.
+  반면, 수정된 후버 손실은 주로 이진 분류 문제에서 사용되며 이진 분류 문제에서 로그 손실의 단점을 보완하기 위해 등장하였다. 로그 손실은 잘못된 예측에 큰 패널티를 부과한다는 점에서 학습을 방해할 수 있으며 이 문제를 해결하고자 나온 것이다.
+  후버 손실과 수정된 후버 손실은 아래와 같이 정의된다.
 
+  
+  <img width="356" alt="스크린샷 2024-08-13 오후 1 47 26" src="https://github.com/user-attachments/assets/6ede9b54-3e9d-4eec-8419-0596b1a34ba8">
+<img width="511" alt="스크린샷 2024-08-13 오후 1 52 06" src="https://github.com/user-attachments/assets/792fdeb1-eb05-428d-ae35-e44334b8a356">
+
+
+* e : 에러 (예측값과 실제값의 차이)
+* 델타 : MSE와 MAE를 나누는 분기점
+* 에러의 절댓값이 델타보다 작을 경우 MSE 적용, 다른 모든 지점에 대하여 MAE 적용
+
+**장점 : 노이즈가 많거나 이상치가 존재하는 데이터셋에 유리하다**
+  
+  
+**단점 : 매개변수 델타 선택에 어려움이 있다. 이 임계값을 적절히 설정하는 것이 매우 중요하다**
+
+
+
+
+## SGCClassifier의 loss : 실습
