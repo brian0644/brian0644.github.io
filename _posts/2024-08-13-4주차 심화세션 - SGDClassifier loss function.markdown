@@ -102,3 +102,65 @@ loss : 손실함수를 지정한다. 기본값은 "hinge" 로, 서포트 벡터 
 
 
 ## SGCClassifier의 loss : 실습
+
+### 1. 분석 환경 준비
+
+```python
+import pandas as pd
+run_walk = pd.read_csv('/Users/brian0644/Desktop/python/khuda/run_or_walk.csv')
+run_walk.columns
+```
+![스크린샷 2024-08-13 오후 11 48 16](https://github.com/user-attachments/assets/65b42e01-59a7-45c9-9abb-4ce69a0b468e)
+
+
+  -> accelerration은 각 축에 대한 각가속도, gyro는 3차원 공간에서 각 축에 대한 각속도를 의미. 
+
+### 2. 데이터 전처리
+
+```python
+# 훈련세트와 테스트세트 분리
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+x = run_walk.drop(['date', 'time', 'username', 'activity'], axis=1)     # 시간, 이름, 종속변수 제거하고 남는 데이터를 데이터로
+y = run_walk['activity']
+
+trainX, testX, trainY, testY = train_test_split(x, y, test_size = 0.2)
+
+
+# 훈련세트와 테스트세트의 데이터(not 타깃) 정규화
+scaler = StandardScaler()
+scaler.fit(trainX)
+trainX = scaler.transform(trainX)
+testX = scaler.transform(testX)
+```
+
+### 3. loss function 5개 비교
+
+```python
+# 필요한 패키지 임포트
+from sklearn.linear_model import SGDClassifier
+from sklearn import svm
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+
+# loss function들을 리스트에 넣고 반복문 진행, scores에 점수 기록
+losses = ["hinge", "log_loss", "modified_huber", "perceptron", "squared_hinge"]
+scores = []
+for loss in losses:
+    clf = SGDClassifier(loss=loss, penalty="l2", max_iter=1000)
+    clf.fit(trainX, trainY)
+    scores.append(clf.score(testX, testY))
+  
+plt.title("Effect of loss")
+plt.xlabel("loss")
+plt.ylabel("score")
+x = np.arange(len(losses))
+plt.xticks(x, losses)
+plt.plot(x, scores) 
+
+```
+### 4. 결과 해석
+![스크린샷 2024-08-14 오전 12 05 26](https://github.com/user-attachments/assets/a997594e-467f-49c4-bc9f-e77132194798)
