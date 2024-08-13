@@ -5,7 +5,7 @@ date:   2024-08-13 12:38 +09:00
 categories: khuda ML session
 ---
 
-# SGDClassifier loss function
+# 4주차 심화세션 - SGDClassifier loss function
 
 ## SGCClassifier의 loss = 
 
