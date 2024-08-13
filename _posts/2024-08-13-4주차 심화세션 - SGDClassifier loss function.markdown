@@ -40,6 +40,8 @@ squard_hinge는 해당 함수에 제곱을한 형태이다
 
   
 <img width="337" alt="스크린샷 2024-08-13 오후 12 47 39" src="https://github.com/user-attachments/assets/5fd67ca8-8f6c-4d5f-84d3-8b71752f2258">
+
+  
 <img width="337" alt="스크린샷 2024-08-14 오전 03 30 02" src="https://github.com/user-attachments/assets/e4d776b2-07b9-4154-89f6-039168115f78">
 
 * y': 이진 분류 모델에서의 예측값
