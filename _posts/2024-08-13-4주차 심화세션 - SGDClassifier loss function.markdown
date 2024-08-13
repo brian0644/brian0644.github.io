@@ -7,7 +7,7 @@ categories: khuda ML session
 
 # 4주차 심화세션 - SGDClassifier loss function
 
-## SGCClassifier의 loss : 이론
+## SGDClassifier의 loss : 이론
 
 ```python
 SGDClassifier(alpha, average, class_weight, epsilon, eta0, fit_intercept, l1_ratio, 
