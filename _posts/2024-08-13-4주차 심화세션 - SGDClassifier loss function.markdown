@@ -128,10 +128,10 @@ squard_hinge는 해당 함수에 제곱을한 형태이다
 ## SGCClassifier의 loss : 실습
 
 ### 1. 분석 환경 준비
-
+데이터 링크 : https://github.com/jiminAn/ML_Project/blob/main/jman/practice_code/data/run_or_walk.csv
 ```python
 import pandas as pd
-run_walk = pd.read_csv('/Users/brian0644/Desktop/python/khuda/run_or_walk.csv')
+run_walk = pd.read_csv('/python/khuda/run_or_walk.csv')
 run_walk.columns
 ```
 ![스크린샷 2024-08-13 오후 11 48 16](https://github.com/user-attachments/assets/65b42e01-59a7-45c9-9abb-4ce69a0b468e)
