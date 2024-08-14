@@ -152,7 +152,7 @@ y = run_walk['activity']
 trainX, testX, trainY, testY = train_test_split(x, y, test_size = 0.2)
 
 
-# 훈련세트와 테스트세트의 데이터(not 타깃) 정규화
+# 훈련세트와 테스트세트의 데이터(not 타깃) 스케일 조정
 scaler = StandardScaler()
 scaler.fit(trainX)
 trainX = scaler.transform(trainX)
