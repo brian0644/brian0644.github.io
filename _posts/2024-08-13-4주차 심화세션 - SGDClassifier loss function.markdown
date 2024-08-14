@@ -164,7 +164,6 @@ testX = scaler.transform(testX)
 ```python
 # 필요한 패키지 임포트
 from sklearn.linear_model import SGDClassifier
-from sklearn import svm
 import matplotlib.pyplot as plt
 import numpy as np
 
