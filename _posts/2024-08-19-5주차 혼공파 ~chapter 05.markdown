@@ -93,7 +93,7 @@ plt.show()
 
 
 
-## 5-1. 결정 트리
+## 5-2. 교차 검증과 그리드 서치
 * 검증 세트 :
   
 일반적으로 테스트 세트로 일반화 성능을 올바르게 예측하려면 가능한 한 테스트 세트를 사용하지 말아야한다<br>
@@ -117,7 +117,7 @@ plt.show()
 cross_validate는 훈련 세트를 섞어서 폴드로 나누지 않기 때문에 분할기(splitter)를 지정해야함
 
 
-* 하이퍼파라미터 튜닝 :
+* 하이퍼파라미터 튜닝 (그리드 서치):
   
 머신러닝 모델에서 사용자가 지정해야만 하는 파라미터를 하이퍼파라미터라고 부름<br>
 이런 하이퍼파라미터 튜닝은 모델마다 적게는 1~2개, 많게는 5~6개 제공<br>
@@ -125,6 +125,15 @@ cross_validate는 훈련 세트를 섞어서 폴드로 나누지 않기 때문�
 각 하이퍼파라미터의 최적값은 다른 하이퍼파라미터의 변화에 영향받음 -> 여러개의 매개변수를 동시에 바꿔가며 최적의 값을 찾아야함<br>
 for 반복문으로 이런 과정을 직접 구현할 수도 있지만 사이킷런에서 제공하는 **그리드 서치**를 사용하면 됨<br>
 사이킷런의 GridSearchCV 클래스는 하이퍼파라미터 탐색과 교차 검증을 한번에 수행 -> cross_validate() 함수를 호출할 필요 없음
+
+
+* 하이퍼파라미터 튜닝 (랜덤 서치) :
+  
+매개변수의 값이 수치일 때, 값의 범위나 간격을 미리 정하기 어려울 수 있음<br>
+또 너무 많은 매개변수 조건이 있어 그리드 서치 수행 시간이 오래 걸릴 수 있음<br>
+이럴 때 **랜덤 서치**를 사용하면 좋음<br>
+랜덤 서치에는 매개변수 값의 목록을 전달하는 것이 아니라 매개변수를 샘플링할 수 있는 확률 분포 객체를 전달
+
 
 
 
@@ -173,5 +182,81 @@ scores = cross_validate(dt, train_input, train_target, cv=splitter)
 print(np.mean(scores['test_score']))
 
 
+# 그리드 서치
+# 기본 매개변수를 사용한 결정 트리 모델에서 min_impurity_decrease의 최적값 찾기
+# 먼저 GridSearchCV 클래스 임포트, 탐색할 매개변수와 탐색할 값의 리스트를 딕셔너리에 담기
+from sklearn.model_selection import GridSearchCV
+params = {'min_impurity_decrease': [0.0001, 0.0002, 0.0003, 0.0004, 0.0005]}
+
+
+
+# GridSearchCV 클래스에 탐색 대상 모델과 params 변수를 전달하여 그리드 서치 객체 생성 (모델, 하이퍼파라미터의 다양한 값)
+# GridSearchCV의 cv는 기본값이 5, 즉 5개의 리스트 값에 대한 5-폴드 교차 검증 수행 -> 총 25개의 모델 훈련
+gs = GridSearchCV(DecisionTreeClassifier(random_state=42), params, n_jobs=-1)
+gs.fit(train_input, train_target)
+
+
+# 검증 점수가 가장 높은 모델의 값은 gs 객체의 best_estimator_ 속성에 저장
+dt = gs.best_estimator_
+print(dt.score(train_input, train_target))
+
+
+# 그리드 서치로 찾은 최적의 매개변수는 best_params_ 속성에 저장
+print(gs.best_params_)
+
+
+# cv_results_ 속성의 'mean_test_score'키에서 5번의 교차 검증으로 얻은 점수 출력
+print(gs.cv_results_['mean_test_score'])
+
+
+# 이제 min_impuritiy_decrease와 max_depth, min_samples_split 3개의 하이퍼파라미터 튜닝
+# np.arange는 첫 번째 매개변수 값에서 시작하여 두 번째 매개변수에 도달할 대까지 세 번째 매개변수를 계속 더한 배열
+# 파이썬의 range는 같은 기능이지만 정수만 가능 
+parmas = {'min_impurity_decrease': np.arange(0.0001, 0.001, 0.0001), 'max_depth': range(5, 20, 1), 'min_samples_split': range(2, 100, 10)}
+
+
+# 각 하이퍼파라미터 튜닝을 위한 그리드 서치 실행
+gs = GridSearchCV(DecisionTreeClassifier(random_state=42), params, n_jobs=-1)
+gs.fit(train_input, train_target)
+print(gs.best_params_)
+
+
+# 최상의 교차 검증 점수도 확인
+print(np.max(gs.cv_results_['mean_test_score']))
+
+
+
+# 랜덤 서치
+# 먼저 싸이파이에서 2개의 확률 분포 클래스 임포트
+# randint 에서는 정수 추출
+from scipy.stats import uniform, randint
+rgen = randint(0,10)
+rgen.rvs(10)
+
+# 10개밖에 안되니까 고르게 샘플링 되지 않음 -> 샘플링 숫자를 늘리면 쉽게 확인 가능
+np.unique(rgen.rvs(1000), return_counts=True)
+
+# uniform 에서는 실수 추출
+ugen = uniform(0,1)
+ugen.rvs(10)
+
+
+
+# 이 로직은 마치 난수 발생기. 랜덤 서치에서 randint와 uniform 클래스 객체를 넘겨주고 총 몇번을 샘플링 해서 최적의 매개변수를 찾아라 명령
+# 샘플링 횟수는 시스템 자원이 허락하는 범위 내에서 최대한 크게 하는 것이 좋음
+# 탐색할 매개변수의 딕셔너리 만들기, min_samples_leaf(리프 노드가 되기 위한 최소 샘플의 개수) 매개변수 추가
+params = {'min_impurity_decrease': uniform(0.0001, 0.001), 'max_depth': randint(20,50), 'min_samples_split': randint(2, 25), 'min_samples_leaf': randint(1, 25),}
+
+
+# 샘플링 횟수는 사이킷런의 랜덤 서치 클래스인 RandomizedSearchCV의 n_iter 매개변수에 지정, 출력
+from sklearn.model_selection import RandomizedSearchCV
+gs = RandomizedSearchCV(DecisionTreeClassifier(random_state=42), params,n_iter=100, n_jobs=-1, random_state=42)
+gs.fit(train_input, train_target)
+print(gs.best_params_)
+print(np.max(gs.cv_results_['mean_test_score']))
+dt = gs.best_estimator_
+print(dt.score(test_input, test_target))
+
+# -> 테스트 세트에 대한 점수는 검증 세트에 대한 점수보다 조금 작은 것이 일반적.
 
 ```
