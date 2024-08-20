@@ -102,40 +102,6 @@ plt.show()
 -> 테스트 세트를 사용하지 않으면 모델이 과대적합인지 과소적합인지 판단하기 어려움 -> 훈련세트를 또 나누어 검증세트로 활용
 <br>
 
-* 교차 검증 :
-  
-보통 많은 데이터를 훈련에 사용할수록 좋은 모델이 만들어짐<br>
-그렇다고 검증 세트를 너무 조금 떼어 놓으면 검증 점수가 들쭉날쭉하고 불안정할것<br>
-이럴 때 **교차검증**을 이용하면 안정적인 검증 점수를 얻고 훈련에 더 많은 데이터 사용 가능<br>
-교차 검증은 검증 세트를 떼어 내어 평가하는 과정을 여러 번 반복함<br>
-그다음 이점수를 평균하여 최종 검증 점수를 얻어냄
-
-<img width="539" alt="스크린샷 2024-08-19 오후 4 49 04" src="https://github.com/user-attachments/assets/c4872202-3717-40f9-a462-d9599001245e">
-
-이러한 과정을 3-fold cross check라고 부름 (훈련 세트를 세 부분으로 나누어 교차 검증 수행, k-fold cross check라고 부름)<br>
-사이킷 런에는 cross_validate()라는 교차 검증 함수가 존재, 평가할 모델 객체를 첫 번째 매개변수로, 그다음 앞에서처럼 직접 검증 세트를 떼어 내지 않고 훈련 세트 전체를 함수에 전달<br>
-cross_validate는 훈련 세트를 섞어서 폴드로 나누지 않기 때문에 분할기(splitter)를 지정해야함
-
-
-* 하이퍼파라미터 튜닝 :
-  **그리드 서치**
-  
-머신러닝 모델에서 사용자가 지정해야만 하는 파라미터를 하이퍼파라미터라고 부름<br>
-이런 하이퍼파라미터 튜닝은 모델마다 적게는 1~2개, 많게는 5~6개 제공<br>
-이 매개변수를 바꿔가면서 모델을 훈련하고 교차 검증 수행(사람의 개입 없이 하이퍼파라미터 튜닝을 자동으로 하는 기술을 'AutoML'이라고 부름)<br>
-각 하이퍼파라미터의 최적값은 다른 하이퍼파라미터의 변화에 영향받음 -> 여러개의 매개변수를 동시에 바꿔가며 최적의 값을 찾아야함<br>
-for 반복문으로 이런 과정을 직접 구현할 수도 있지만 사이킷런에서 제공하는 **그리드 서치**를 사용하면 됨<br>
-사이킷런의 GridSearchCV 클래스는 하이퍼파라미터 탐색과 교차 검증을 한번에 수행 -> cross_validate() 함수를 호출할 필요 없음
-
-  **랜덤 서치**
-매개변수의 값이 수치일 때, 값의 범위나 간격을 미리 정하기 어려울 수 있음<br>
-또 너무 많은 매개변수 조건이 있어 그리드 서치 수행 시간이 오래 걸릴 수 있음<br>
-이럴 때 **랜덤 서치**를 사용하면 좋음<br>
-랜덤 서치에는 매개변수 값의 목록을 전달하는 것이 아니라 매개변수를 샘플링할 수 있는 확률 분포 객체를 전달
-
-
-
-
 ```python
 # 훈련세트에서 또 20%를 떼와서 검증 세트로 준비
 sub_input, val_input, sub_target, val_target = train_test_split(train_input,train_target,test_size=0.2,random_state=42)
@@ -162,8 +128,24 @@ print(scores)
 
 # 검증 세트에 대한 점수 평균치 계산
 print(np.mean(scores['test_score']))
+```
+
+* 교차 검증 :
+  
+보통 많은 데이터를 훈련에 사용할수록 좋은 모델이 만들어짐<br>
+그렇다고 검증 세트를 너무 조금 떼어 놓으면 검증 점수가 들쭉날쭉하고 불안정할것<br>
+이럴 때 **교차검증**을 이용하면 안정적인 검증 점수를 얻고 훈련에 더 많은 데이터 사용 가능<br>
+교차 검증은 검증 세트를 떼어 내어 평가하는 과정을 여러 번 반복함<br>
+그다음 이점수를 평균하여 최종 검증 점수를 얻어냄
+
+<img width="539" alt="스크린샷 2024-08-19 오후 4 49 04" src="https://github.com/user-attachments/assets/c4872202-3717-40f9-a462-d9599001245e">
+
+이러한 과정을 3-fold cross check라고 부름 (훈련 세트를 세 부분으로 나누어 교차 검증 수행, k-fold cross check라고 부름)<br>
+사이킷 런에는 cross_validate()라는 교차 검증 함수가 존재, 평가할 모델 객체를 첫 번째 매개변수로, 그다음 앞에서처럼 직접 검증 세트를 떼어 내지 않고 훈련 세트 전체를 함수에 전달<br>
+cross_validate는 훈련 세트를 섞어서 폴드로 나누지 않기 때문에 분할기(splitter)를 지정해야함
 
 
+```python
 # 사이킷런의 분할기는 교차 검증에서 폴드를 어떻게 나눌지 결정
 # cross_validate() 함수는 기본적으로 회귀 모델일 경우 KFold 분할기를 사용하고
 # 분류 모델일 경우 타깃 클래스를 골고루 나누기 위해 StratifiedKFold를 사용
@@ -178,8 +160,23 @@ print(np.mean(scores['test_score']))
 splitter = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
 scores = cross_validate(dt, train_input, train_target, cv=splitter)
 print(np.mean(scores['test_score']))
+```
 
 
+
+* 하이퍼파라미터 튜닝 :
+  **그리드 서치**
+  
+머신러닝 모델에서 사용자가 지정해야만 하는 파라미터를 하이퍼파라미터라고 부름<br>
+이런 하이퍼파라미터 튜닝은 모델마다 적게는 1~2개, 많게는 5~6개 제공<br>
+이 매개변수를 바꿔가면서 모델을 훈련하고 교차 검증 수행(사람의 개입 없이 하이퍼파라미터 튜닝을 자동으로 하는 기술을 'AutoML'이라고 부름)<br>
+각 하이퍼파라미터의 최적값은 다른 하이퍼파라미터의 변화에 영향받음 -> 여러개의 매개변수를 동시에 바꿔가며 최적의 값을 찾아야함<br>
+for 반복문으로 이런 과정을 직접 구현할 수도 있지만 사이킷런에서 제공하는 **그리드 서치**를 사용하면 됨<br>
+사이킷런의 GridSearchCV 클래스는 하이퍼파라미터 탐색과 교차 검증을 한번에 수행 -> cross_validate() 함수를 호출할 필요 없음
+
+
+
+```python
 # 그리드 서치
 # 기본 매개변수를 사용한 결정 트리 모델에서 min_impurity_decrease의 최적값 찾기
 # 먼저 GridSearchCV 클래스 임포트, 탐색할 매개변수와 탐색할 값의 리스트를 딕셔너리에 담기
@@ -222,8 +219,17 @@ print(gs.best_params_)
 # 최상의 교차 검증 점수도 확인
 print(np.max(gs.cv_results_['mean_test_score']))
 
+```
 
 
+  **랜덤 서치**
+매개변수의 값이 수치일 때, 값의 범위나 간격을 미리 정하기 어려울 수 있음<br>
+또 너무 많은 매개변수 조건이 있어 그리드 서치 수행 시간이 오래 걸릴 수 있음<br>
+이럴 때 **랜덤 서치**를 사용하면 좋음<br>
+랜덤 서치에는 매개변수 값의 목록을 전달하는 것이 아니라 매개변수를 샘플링할 수 있는 확률 분포 객체를 전달
+
+
+```python
 # 랜덤 서치
 # 먼저 싸이파이에서 2개의 확률 분포 클래스 임포트
 # randint 에서는 정수 추출
@@ -258,3 +264,172 @@ print(dt.score(test_input, test_target))
 # -> 테스트 세트에 대한 점수는 검증 세트에 대한 점수보다 조금 작은 것이 일반적.
 
 ```
+
+
+
+
+
+## 5-3. 트리의 앙상블
+* 앙상블 학습 :
+  
+  * 정형 데이터 : 어떤 구조로 되어있으며 csv나 데이터베이스, 엑셀에 저장하기 쉬운 데이터들<br>
+  * 비정형 데이터 : 책의 글과 같은 텍스트 데이터, 사진, 음악 등 <br>
+-> 이중 정형 데이터를 다루는 데 가장 뛰어난 성과를 내는 알고리즘이 **앙상블 학습** 이다
+
+* 랜덤 포레스트 :
+  
+앙상블 학습 방법 중 하나로 안정적인 성능 덕분에 널리 사용되고 있는 기법<br>
+이름 자체로 유추할 수 있듯이 랜덤 포레스트는 결정 트리를 랜덤하게 만들어 결정 트리의 "숲"을 만드는 셈<br>
+그리고 각 결정 트리의 예측을 사용해 최종 예측을 만듬<br>
+<br>
+각 트리를 훈련하기 위한 데이터를 랜덤하게 만듬 (우리가 입력한 훈련 데이터에서 랜덤하게 샘플을 추출하여 훈련 데이터를 만들며, 한 샘플이 중복 추출 가능) -> 부트스트랩 샘플 -> OOB 샘플 발생<br>
+이때 부트스트랩 샘플은 훈련세트의 크기와 같게 만듬.<br>
+또한 각 노드를 분할할 때 전체 특성 중에서 일부 특성을 무작위로 고른 다음 이 중에서 최선의 분할을 찾는다<br>
+분류모델인 RandomForestClassfier은 기본적으로 전체 특성 개수의 제곱근 만큼 특성을 선택, 그중에서 최선의 분할 특성을 선택하는 방식<br>
+사이킷런의 랜덤 포레스트는 기본적으로 100개의 결정 트리를 이런 방식으로 훈련, 각 트리의 클래스별 확률을 평균하여 가장 높은 확률을 가진 클래스를 예측으로 삼는다<br>
+랜덤 포레스트는 랜덤하게 선택한 샘플과 특성을 사용하기 때문에 훈련 세트에 과대적합되는 것을 막아주고 검증 세트와 테스트 세트에서 안정적인 성능을 얻을 수 있다<br>
+**사이킷런의 RandomForestClassifier**
+
+
+```python
+# 데이터 준비
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+wine = pd.read_csv('https://bit.ly/wine-date')
+wine_input = wine[['alcohol','sugar','pH']].to_numpy()
+wine_target = wine['class'].to_numpy()
+train_input, test_input, train_target, test_target = train_test_split(wine_input,wine_target,test_size=0.2,random_state=42)
+
+
+
+# 랜덤포레스트 모델 생성 후 교차검증 수행
+# 사이킷런의 랜덤포레스트는 기본적으로 100개의 결정 트리를 사용하므로 모든 코어를 사용하는게 좋음
+from sklearn.model_selection import cross_validate
+from sklearn.ensemble import RandomForestClassifier
+rf = RandomForestClassifier(n_jobs=-1, random_state=42)
+scores = cross_validate(rf, train_input, train_target, return_train_score=True, n_jobs=-1)
+print(np.mean(scores['train_score']), np.mean(scores['test_score']))
+# -> 훈련 점수가 더 높은 것으로 보아 과대적합 발생
+
+
+
+# 랜덤포레스트 또한 결정 트리 모델을 사용하기 때문에 매개변수 또한 동일하게 제공한다
+# 결정트리의 큰 장점은 특성 중요도를 계산할 수 있다는 점이다
+# 랜덤 포레스트의 특성 중요도는 각 결정 트리의 특성 중요도를 취합한 것이다 -> 특성 중요도 출력해보기
+rf.fit(train_input, train_target)
+print(rf.feature_importances_)
+# -> 이전 결정 트리 특성 중요도와 비교했을때 랜덤 포레스트 모델의 특성 중요도는 당도 중요도 감소, 알콜 도수, ph 중요도 조금 상승 -> 하나의 특성에 과도하게 집중하지 않고 좀 더 많은 특성이 훈련에 기여할 기회를 얻기 때문
+
+
+
+
+# 랜덤 포레스트에는 자체적으로 모델을 평가하는 점수를 출력 가능
+# 랜덤 포레스트는 훈련 세트에서 중복을 허용하여 부트스트랩 샘플을 만들다보니 포함되지 않는 샘플이 존재하기도 함
+# 이런 샘플을 OOB 샘플이라고 부름
+# 이 남는 OOB 샘플로 검증 세트 역할 수행
+# oob_score = True -> OOB 샘플로 평균 점수 출력
+
+rf = RandomForestClassifier(oob_score=True ,n_jobs=-1, random_state=42)
+rf.fit(train_input, train_target)
+print(rf.oob_score_)
+```
+
+
+* 엑스트라 트리 :
+  
+랜덤 포레스트와 매우 비슷하게 작동 -> 기본적으로 100개의 결정 트리를 훈련하고 결정 트리의 매개변수를 지원<br>
+엑스트라 트리가 무작위성이 더 크기 때문에 랜덤 포레스트보다 더 많은 결정 트리를 훈련, 하지만 랜덤하게 노드를 분할하다보니 계산이 빠름<br>
+하나의 결정 트리에서 특성을 무작위로 분할하면 성능이 낮아지겠지만 많은 트리를 앙상블 하기 때문에 과대적합을 막고 검증 세트의 점수를 높이는 효과 존재<br>
+**사이킷런의 ExtraTreesclassifier**
+
+```python
+# 엑스트라 트리 임포트 후 학습
+from sklearn.ensemble import ExtraTreesClassifier
+et = ExtraTreesClassifier(n_jobs=-1, random_state=42)
+scores = cross_validate(et, train_input, train_target, return_train_score=True, n_jobs=-1)
+print(np.mean(scores['train_score']), np.mean(scores['test_score']))
+
+
+# 엑스트라 트리 특성 중요도 출력
+et.fit(train_input, train_target)
+print(et.feature_importances_)
+```
+
+* 그레이디언트 부스팅 :
+  
+깊이가 얕은 결정 트리를 사용하여 이전 트리의 오차를 보완하는 방식<br>
+**사이킷런의 GradientBoostingClassifier**은 기본적으로 깊이가 3인 결정트리 100개 제공<br>
+깊이가 얕은 결정트리를 사용하기 때문에 과대적합에 강하고 일반적으로 높은 일반화 성능 기대 가능<br>
+그레이디언트 부스팅은 결정 트리를 계속 추가하면서 손실함수의 낮은 곳으로 천천히 이동하는 방식 -> 학습률 매개변수로 속도 조절 가능<br>
+그레이디언트 부스팅의 subsample은 트리 훈련에 사용할 훈련 세트의 비율을 정함<br>
+이 매개변수는 기본값 1.0, 더 작으면 당연히 훈련 세트의 일부만 사용 -> 이는 마치 경사 하강법에서 확률적 경사 하강법이나 미니배치 경사 하강법과 비슷<br>
+일반적으로 그레이디언트 부스팅이 랜덤 포레스트보다 조금 더 높은 성능을 얻을 수는 있지만 순서대로 트리를 추가하기 떄문에 속도가 느리다
+
+
+
+
+```python
+# 그레이디언트 임포트 후 모델 학습
+from sklearn.ensemble import GradientBoostingClassifier
+gb = GradientBoostingClassifier(random_state=42)
+scores = cross_validate(gb, train_input, train_target, return_train_score=True, n_jobs=-1)
+print(np.mean(scores['train_score']), np.mean(scores['test_score']))
+
+
+
+
+# 그레이디언트 부스팅은 결정 트리의 개수를 늘려도 과대적합에 매우 강하며 학습률을 증가시키고 트리의 개수를 늘리면 조금 더 성능이 향상 가능
+gb = GradientBoostingClassifier(n_estimators=500, learning_rate= 0.2, random_state=42)
+scores = cross_validate(gb, train_input, train_target, return_train_score=True, n_jobs=-1)
+print(np.mean(scores['train_score']), np.mean(scores['test_score']))
+
+
+
+# 그레이디언트 부스팅에서 특성 중요도 출력
+gb.fit(train_input, train_target)
+print(gb.feature_importances_)
+```
+
+
+* 히스토그램 기반 그레이디언트 부스팅 :
+  
+정형 데이터를 다루는 머신러닝 알고리즘 중에 가장 인기가 높은 알고리즘<br>
+입력 특성을 256개의 구간으로 나누기 때문에 노드를 분할할 때 최적의 분할을 매우 빠르게 찾을 수 있음<br>
+256개의 구간 중에서 하나를 떼어놨다가 누락된 값을 찾을때 사용 -> 입력에 누락된 특성이 있더라도 이를 따로 전처리할 필요 없음<br>
+**사이킷런의 HistGradientBoostingClassifier**은 기본적으로 트리의 개수를 max_iter로 조정
+
+
+```python
+# 히스토그램 기반 그레이디언트 부스팅 임포트 후 모델 학습
+from sklearn.ensemble import HistGradientBoostingClassifier
+hgb = HistGradientBoostingClassifier(random_state=42)
+scores = cross_validate(hgb, train_input, train_target, return_train_score=True)
+print(np.mean(scores['train_score']), np.mean(scores['test_score']))
+
+
+
+
+# 히스토그램 기반 그레이디언트 부스팅에서 특성 중요도 출력
+hgb.fit(train_input, train_target)
+print(rf.feature_importances_)
+hgb.score(test_input, test_target)
+
+
+
+# colab에서 XGBoost를 통해 사용 가능
+# from xgboost import XGBClassifier
+# xgb = XGBClassifier(tree_method='hist', random_state=42)
+# scores = cross_validate(xgb, train_input, train_target, return_train_score=True)
+# print(np.mean(scores['train_score']), np.mean(scores['test_score']))
+
+
+# colab에서 LightGBM을 통해 사용 가능
+# from lightgbm import LGBMClassifier
+# lgb = LGBMClassifier(random_state=42)
+# scores = cross_validate(lgb, test_input, test_target, return_train_score=True)
+# print(np.mean(scores['train_score']), np.mean(scores['test_score']))
+```
+
+
+
