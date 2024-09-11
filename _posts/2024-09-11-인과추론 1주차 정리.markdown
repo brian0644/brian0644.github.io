@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "인과추론 1주차 정리"
-date:   2024-09-11 11:158+09:00
+date:   2024-09-11 11:58+09:00
 categories: khuda causal inference study
 ---
 
