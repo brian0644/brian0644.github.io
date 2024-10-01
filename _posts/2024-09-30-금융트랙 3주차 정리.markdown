@@ -135,10 +135,13 @@ plt.xlabel("Principal Component")
 plt.show()
 ```
 <br>
+
 ![Unknown](https://github.com/user-attachments/assets/b056d17b-ef3e-4053-86ed-77172d1fd3ad)
 <br>
+
 ![Unknown-2](https://github.com/user-attachments/assets/33c1c1f6-592b-4c0f-91bf-7a557e6c5172)
 <br>
+
 3번쨰 주성분까지만 해도 분산 설명력이 충분하기 때문에 해당 주성분들의 가중치를 시각화한 것이며
 <br>
 * 주성분 1 : 고유 벡터는 각 특성에 대한 모두 양의 가중치를 가지며 이는 채권 만기에 따라 동일한 방향으로 가중치가 부여됐음을 확인할 수 있다. 즉, 모든 만기가 동일한 방향으로 이동하도록 하는 움직임을 반영하기 때문에 그 방향은 수익률 곡선의 방향이동(평행이동)에 해당한다.
@@ -164,6 +167,7 @@ plt.show()
 ```
 
 <br>
+
 ![Unknown-3](https://github.com/user-attachments/assets/81d41825-599b-4851-9b5c-7849d3816bfc)
 <br>
 -> 또한 이렇게 선택한 주성분들을 토대로 역으로 원본데이터와 근사하는 데이터 재현이 가능하다
