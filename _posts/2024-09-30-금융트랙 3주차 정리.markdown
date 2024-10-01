@@ -1,4 +1,4 @@
----
+![image](https://github.com/user-attachments/assets/251cc643-0d3d-463c-978a-684874fe103f)---
 layout: post
 title:  "금융트랙 3주차 정리"
 date:   2024-09-30 15:01+09:00
@@ -8,5 +8,158 @@ categories: khuda finance track
 * 비지도 학습 알고리즘은 데이터가 산출하려는 출력에 대한 지식 없이 데이터에서 패턴을 추론한다
 * 레이블 데이터를 요하지 않기 때문에 분석과 모델 개발에 더 큰 데이터셋을 쉽게 사용할 수 있다
 * 레이블 데이터는 시간이 오래걸리고 생성하거나 획득하는 데 비실용적일 수 있다
+* 그 중에서도 차원축는 정보 손실을 최소화하면서 원래 특성에서 가장 중요한 것을 포착하는 변수의 더 작은 셋을 찾는 방법으로 데이터를 압축한다. 차원축소는 높은 차원과 관련된 문제를 완화하는 데 도움이 되며, 탐색하기 어려운 고차원 데이터의 주요 특성을 시각화 할 수 있다
+<br>
+-> 데이터셋의 잡음과 중복을 줄이고 더 적은 특성을 사용해 데이터셋을 찾아서 고려할 변수를 줄이고 데이터셋의 탐색과 시각화를 간단하게 한다.
+<br>
+-> 또한 차원 축소 기술은 특성 수를 줄이거나 새로운 특성을 찾아서 지도 학습 기반 모델을 향상시킨다.
 
 
+## 예제 : 수익률 곡선 구축 및 이자율 모델링
+
+```python
+# Load libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler
+
+#Import Model Packages
+from sklearn.decomposition import PCA
+
+import requests
+import pandas as pd
+
+# Replace 'YOUR_FRED_API_KEY' with your actual FRED API key
+API_KEY = '72753884a1156f9d72b21142b30e9b70'
+
+# Treasury datasets from FRED
+treasury_series = {
+    '1 Month': 'DGS1MO',
+    '3 Month': 'DGS3MO',
+    '6 Month': 'DGS6MO',
+    '1 Year': 'DGS1',
+    '2 Year': 'DGS2',
+    '3 Year': 'DGS3',
+    '5 Year': 'DGS5',
+    '7 Year': 'DGS7',
+    '10 Year': 'DGS10',
+    '20 Year': 'DGS20',
+    '30 Year': 'DGS30'
+}
+
+# Function to get data from FRED API
+def get_fred_data(series_id, api_key):
+    url = f'https://api.stlouisfed.org/fred/series/observations?series_id={series_id}&api_key={api_key}&file_type=json'
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()['observations']
+        dates = [obs['date'] for obs in data]
+        values = [obs['value'] for obs in data]
+        return pd.DataFrame({'Date': dates, series_id: values})
+    else:
+        print(f"Error fetching data for {series_id}")
+        return None
+
+# Create an empty DataFrame to store all treasury data
+treasury_df = pd.DataFrame()
+
+# Fetch and merge data for each series
+for label, series_id in treasury_series.items():
+    data = get_fred_data(series_id, API_KEY)
+    if treasury_df.empty:
+        treasury_df = data
+    else:
+        treasury_df = pd.merge(treasury_df, data, on='Date')
+
+# Set 'Date' as the index and convert data types
+treasury_df['Date'] = pd.to_datetime(treasury_df['Date'])
+treasury_df.set_index('Date', inplace=True)
+
+# Display the data
+dataset = treasury_df
+
+scaler = StandardScaler().fit(dataset)
+rescaledDataset = pd.DataFrame(scaler.fit_transform(dataset),columns = dataset.columns, index = dataset.index)
+# summarize transformed data
+dataset.dropna(how='any', inplace=True)
+rescaledDataset.dropna(how='any', inplace=True)
+rescaledDataset.head(2)
+
+pca = PCA()
+PrincipalComponent=pca.fit(rescaledDataset)
+
+NumEigenvalues=5
+fig, axes = plt.subplots(ncols=2, figsize=(14,4))
+pd.Series(pca.explained_variance_ratio_[:NumEigenvalues]).sort_values().plot.barh(title='Explained Variance Ratio by Top Factors',ax=axes[0]);
+pd.Series(pca.explained_variance_ratio_[:NumEigenvalues]).cumsum().plot(ylim=(0,1),ax=axes[1], title='Cumulative Explained Variance');
+
+# explained_variance
+pd.Series(np.cumsum(pca.explained_variance_ratio_)).to_frame('Explained Variance_Top 5').head(NumEigenvalues).style.format('{:,.2%}'.format)
+```
+<br>
+<img width="1191" alt="스크린샷 2024-10-01 오후 4 08 45" src="https://github.com/user-attachments/assets/51a28754-6d85-4af1-8906-5505b6191a61">
+<br>
+-> 데이터 셋을 준비, 스케일 단위 맞추고 PCA분석을 진행한 결과이다. 각 주성분에 따른 분산 설명력이 나타나고 있다
+
+
+```python
+def PCWeights():
+    '''
+    Principal Components (PC) weights for each 28 PCs
+    '''
+    weights = pd.DataFrame()
+
+    for i in range(len(pca.components_)):
+        weights["weights_{}".format(i)] = pca.components_[i] / sum(pca.components_[i])
+
+    weights = weights.values.T
+    return weights
+
+weights=PCWeights()
+
+weights = PCWeights()
+NumComponents=3
+
+topPortfolios = pd.DataFrame(weights[:NumComponents], columns=dataset.columns)
+topPortfolios.index = [f'Principal Component {i}' for i in range(1, NumComponents+1)]
+
+axes = topPortfolios.T.plot.bar(subplots=True, legend=False,figsize=(14,10))
+plt.subplots_adjust(hspace=0.35)
+axes[0].set_ylim(0, .2);
+
+
+plt.plot(pca.components_[0:3].T)
+plt.xlabel("Principal Component")
+plt.show()
+```
+<br>
+![Unknown](https://github.com/user-attachments/assets/b056d17b-ef3e-4053-86ed-77172d1fd3ad)
+<br>
+![Unknown-2](https://github.com/user-attachments/assets/33c1c1f6-592b-4c0f-91bf-7a557e6c5172)
+<br>
+3번쨰 주성분까지만 해도 분산 설명력이 충분하기 때문에 해당 주성분들의 가중치를 시각화한 것이며
+<br>
+* 주성분 1 : 고유 벡터는 각 특성에 대한 모두 양의 가중치를 가지며 이는 채권 만기에 따라 동일한 방향으로 가중치가 부여됐음을 확인할 수 있다. 즉, 모든 만기가 동일한 방향으로 이동하도록 하는 움직임을 반영하기 때문에 그 방향은 수익률 곡선의 방향이동(평행이동)에 해당한다.
+* 주성분 2 : 고유 벡터는 성분의 절반이 음수이고 나머지는 양수. 결과적으로 수익률 곡선의 기울기 이동을 나타낸다.
+* 주성분 3 : 양 -> 음 -> 양. 수익률 곡선의 곡률이동을 나타낸다.
+<br>
+<br>
+<br>
+```python
+pca.transform(rescaledDataset)[:,:2]
+
+
+nComp=3
+reconst= pd.DataFrame(np.dot(pca.transform(rescaledDataset)[:,:nComp], pca.components_[:nComp,:]),columns=dataset.columns)
+plt.figure(figsize=(10,8))
+plt.plot(reconst)
+plt.ylabel("Treasury Rate")
+plt.title("Reconstructed Dataset")
+plt.show()
+```
+<br>
+![Unknown-3](https://github.com/user-attachments/assets/81d41825-599b-4851-9b5c-7849d3816bfc)
+<br>
+-> 또한 이렇게 선택한 주성분들을 토대로 역으로 원본데이터와 근사하는 데이터 재현이 가능하다
