@@ -177,3 +177,74 @@ plt.show()
 * 군집화는 데이터의 볼륨을 줄이고 패턴을 찾는 방법이다. 하지만 주성분이라는 새로운 변수를 만드는게 아니라 원본 데이터를 분류한다
 * 군집화 알고리즘은 유사한 데이터 포인트로 구성된 부분에 관측치를 할당한다
 * 주어진 군집의 항목이 서로 다른 군집의 항목보다 서로 더 유사하도록, 데이터에서 자연스러운 그룹화를 찾는 것이다.
+
+## 예제: 포트폴리오 관리(투자자 군집화)
+
+```python
+# Load libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import datetime
+
+#Import Model Packages
+from sklearn.cluster import KMeans, AgglomerativeClustering,AffinityPropagation
+from sklearn import metrics
+
+#Other Helper Packages and functions
+import matplotlib.ticker as ticker
+from itertools import cycle
+
+from google.colab import drive
+drive.mount('/content/drive)
+
+dataset = pd.read_excel("/content/drive/MyDrive/KHUDA 금융/ProcessedData.xlsx")
+
+
+# K-means - SSE 평가
+distorsions = []
+max_loop=40
+for k in range(2, max_loop):
+    k_means = KMeans(n_clusters=k)
+    k_means.fit(X)
+    distorsions.append(k_means.inertia_)
+fig = plt.figure(figsize=(10, 5))
+plt.plot(range(2, max_loop), distorsions)
+plt.xticks([i for i in range(2, max_loop)], rotation=75)
+plt.xlabel("Number of clusters")
+plt.ylabel("Sum of Square Error")
+plt.grid(True)
+```
+<br>
+
+<img width="648" alt="스크린샷 2024-10-01 오후 4 20 03" src="https://github.com/user-attachments/assets/4a14fec9-0692-4c16-8356-1bfaf03e84b5">
+
+<br>
+-> 지정한 k에 따른 오류(SSE)를 측정한 것이다. 7개의 군집 이후 꼬임이 발생하는 것을 확인할 수 있다
+
+
+```python
+nclust=7
+#Fit with k-means
+k_means = KMeans(n_clusters=nclust)
+k_means.fit(X)
+
+cluster_output= pd.concat([pd.DataFrame(X), pd.DataFrame(k_means.labels_, columns = ['cluster'])],axis = 1)
+output=cluster_output.groupby('cluster').mean()
+output
+
+# 인구 통계 특성
+output[['AGE','EDUC','MARRIED','KIDS','LIFECL','OCCAT']].plot.bar(rot=0, figsize=(18,5));
+
+# 재무 및 행동 속성
+output[['HHOUSES','NWCAT','INCCL','WSAVED','SPENDMOR','RISK']].plot.bar(rot=0, figsize=(18,5));
+```
+
+![Unknown-4](https://github.com/user-attachments/assets/413f41ca-4d50-41be-a564-0dcde3a367af)
+![Unknown-5](https://github.com/user-attachments/assets/36b29bcd-cdc6-45cb-82ab-b527cfb9da62)
+
+-> 각 군집들에 속해있는 데이터들의 평균 특성 값이 얼마인지 나타나고 있다. 이를 활용하면 군집 특성에 맞는 적절한 포트폴리오를 적용할 수 있을 것이다.
+
+
+
