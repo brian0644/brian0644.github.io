@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/251cc643-0d3d-463c-978a-684874fe103f)---
+---
 layout: post
 title:  "금융트랙 3주차 정리"
 date:   2024-09-30 15:01+09:00
@@ -147,7 +147,10 @@ plt.show()
 <br>
 <br>
 <br>
+
+
 ```python
+
 pca.transform(rescaledDataset)[:,:2]
 
 
@@ -159,7 +162,14 @@ plt.ylabel("Treasury Rate")
 plt.title("Reconstructed Dataset")
 plt.show()
 ```
+
 <br>
 ![Unknown-3](https://github.com/user-attachments/assets/81d41825-599b-4851-9b5c-7849d3816bfc)
 <br>
 -> 또한 이렇게 선택한 주성분들을 토대로 역으로 원본데이터와 근사하는 데이터 재현이 가능하다
+<br>
+
+# 비지도학습 : 군집화
+* 군집화는 데이터의 볼륨을 줄이고 패턴을 찾는 방법이다. 하지만 주성분이라는 새로운 변수를 만드는게 아니라 원본 데이터를 분류한다
+* 군집화 알고리즘은 유사한 데이터 포인트로 구성된 부분에 관측치를 할당한다
+* 주어진 군집의 항목이 서로 다른 군집의 항목보다 서로 더 유사하도록, 데이터에서 자연스러운 그룹화를 찾는 것이다.
