@@ -83,6 +83,99 @@ categories: khuda finance track
   * 이런식으로 가장 자주 사용되는 용어를 메모하기 위해 전체 문서에 대한 단어 클라우드도 생성 가능
 
 
+# 평균-분산 전략 구현 및 시뮬레이션 분석
+
+* 평균-분산 전략을 선택했다면, 룩백 기간과 리밸런싱 주기를 정해야함(하이퍼 파라미터로써) >> 시뮬레이션을 통해 룩백 기간과 리밸런싱 주기 선택 가능 (가장 좋았던 성과를 보인 파라미터로)
+* 투자 전략을 시뮬레이션 하기 위해서 1. 데이터 수집, 2. 투자 전략, 3. 시뮬레이션, 4. 시뮬레이션 분석의 개발 단계로 진행.
+  * 투자전략 개발 단계에는 투자 유니버스를 정의하고 평균 분산 모델 최적화와 같은 자산 배분 알고리즘 개발
+  * 시뮬레이션 개발 단계에서는 실제 금융 거래 환경을 재현하기 위해 거래에 참옇나느 투자자, 중개인과 같은 참여자들을 모델링 하고 주문 생성, 거래 실행, 거래비용 처리, 결과 기록과 같은 프로세스 구현
+<img width="231" alt="스크린샷 2024-10-09 오후 3 44 44" src="https://github.com/user-attachments/assets/c82d2b51-e38d-4a2e-817a-2013c8e78e4a">
+
+
+## 데이터 수집
+평균 분산 전략 시뮬레이션을 구현하기 위한 첫 번째 단계로 어떤 데이터가 필요하고 어떻게 수집할 수 있는지 확인해보자
+<br>
+종목은 코스피 대표 종목 9가지
+<img width="571" alt="스크린샷 2024-10-09 오후 3 45 49" src="https://github.com/user-attachments/assets/94d92b07-0abd-41d8-8cc5-ed10611a2a99">
+
+이렇게 선택할 예정이며 시뮬레이션 기간은 2020년 7월 10일 ~ 2023년 9월 27일로 설정
+<br>
+* 시뮬레이션을 수행하기 위해서는 우선 해당 종목의 주가 데이터가 필요하므로 한국 증권 시장의 주가 데이터를 수집하기 위해 PyKrx라는 파이썬 라이브러리 사용
+* 해당 라이브러리는 한국 거래소등의 국내 주요 주식 정보 제공 웹사이트에서 시장 데이터를 스크래핑 할 수 있는 API 제공
+
+<img width="426" alt="스크린샷 2024-10-09 오후 3 47 20" src="https://github.com/user-attachments/assets/3581ed45-c084-445b-b236-f14d5b99fcbd">
+
+## 평균 분산 최적화
+이제 평균 분산 모델의 최적화를 구현하는 과정을 살펴보자. 평균 분산 모델을 적용하기 위해서는 자산의 기대 수익률과 공분산 행렬이 필요하다
+<img width="283" alt="스크린샷 2024-10-09 오후 3 49 52" src="https://github.com/user-attachments/assets/5abd7daa-845f-4db6-9afc-18b65a06cea1">
+
+가장 쉬운 방법은 자산의 과거 수익률 데이터를 사용해서 계산하는 방법. 즉 자산의 평균 수익률을 기대 수익률로, 수익률 표본 공분산 행렬을 자산 간 공분산 행렬로 계산
+* pyPortfolioOpt를 사용하는 방식으로 투자 포트폴리오 최적화를 진행한다
+  * 기대 수익률 추정 : 과거 데이터를 이용한 기대 수익률을 추정
+  * 위험도 추정 : 과거 데이터를 이요해서 수익률의 공분산 행렬을 정의
+  * 최적화할 목적 함수 : 자산 배분을 수행할 평균-분산 모델의 목적함수 선택
+  * 옵티마이저 : 주어진 자산 목록에서 평균-분산 모델의 최적화를 수행해 최적의 포트폴리오의 자산 편입 비중을 계산
+
+```python
+def calculate_return(ohlcv_data: pd.DataFrame):
+    close_data = ohlcv_data[['close', 'ticker']].reset_index().set_index(
+        ['ticker', 'date'])
+    close_data = close_data.unstack(level=0)
+    close_data = close_data['close']
+    return_data = close_data.pct_change(1) * 100
+    return return_data
+
+
+def get_mean_variance_weights(return_data: pd.DataFrame,
+                              risk_aversion: int) -> Optional[Dict]:
+    # 수익률 계산
+    expected_return = return_data.mean(skipna=False).to_list()
+    # 공분산 행렬 계산
+    cov = return_data.cov(min_periods=len(return_data))
+
+    if cov.isnull().values.any() or cov.empty:
+        return None
+
+    # 평균-분산 최적화
+    ef = EfficientFrontier(
+        expected_returns=expected_return,
+        cov_matrix=cov,
+        solver='OSQP'
+    )
+    ef.max_quadratic_utility(risk_aversion=risk_aversion)
+    # 0에 가까운 편입비중 처리
+    weights = dict(ef.clean_weights(rounding=None))
+    return weights
+```
+-> 먼저 calculate_return 함수로 주가 데이터를 받아서 수익률 계산한 후 반환
+-> 이어서 포트폴리오의 자산 편입 비중을 계산하는 get_mean_variance_weights 함수를 통해 수익률 데이터와 위험 회피 계수를 입력 파라미터로 받아 투자 포트폴리오의 자산 편입 비중을 반환
+
+
+## 거래 흐름 모델링
+시뮬레이션을 할 때는 현실에 가깝게 금융 환경을 모델링하고 거래 과정을 재현해 보다 정확하게 투자 전략을 평가하는 것이 중요하다. 즉 실제 거래가 발생했을 때의 상황을 재현할 수 있어야 하며 그에 따른 자산 보유 현황을 정확히 추적하는 과정이 필요하다. 이에따라 오픈 소스 시뮬레이션 패키지인 지플라인(Zipline)의 모델을 참조
+
+
+<img width="415" alt="스크린샷 2024-10-09 오후 3 55 32" src="https://github.com/user-attachments/assets/e09892b8-9bb9-418a-9348-65d18116d51f">
+
+이에 따라 각 상황에 맞는 클래스를 활용해서 주문, 거래를 시뮬레이션 함
+
+## 시뮬레이션 결과 전처리 및 평가
+계좌에는 시뮬레이션 과정의 모든 히스토리가 저장돼 있음. 시뮬레이션 결과를 분석하기 전에 전처리
+
+<img width="201" alt="스크린샷 2024-10-09 오후 3 59 20" src="https://github.com/user-attachments/assets/a643700e-3217-4576-bfa6-ebcc62381c7a">
+<img width="385" alt="스크린샷 2024-10-09 오후 4 02 59" src="https://github.com/user-attachments/assets/fdeba680-84f6-4a2b-bcc1-3260daca9928">
+
+ 평가는 해당 지표들로 성능을 확인할 수 있다
+
+
+
+
+
+
+
+
+
+
 
 
 
