@@ -1,0 +1,14 @@
+---
+layout: post
+title:  "[깃 스터디] 1일차 정리"
+date:   2025-01-26 17:28 +09:00
+categories: khuda study
+---
+# version control
+<img width="243" alt="스크린샷 2025-01-26 오후 5 29 52" src="https://github.com/user-attachments/assets/91dff4cf-5a1e-4d5f-bcdf-ed54cc519ec6" />
+
+
+  전체적인 맥락은 이러한 방식이다. 우리가 깃허브에서 볼 수 있는 "브랜치"는 굵은 메인 버전을 중심으로 여러가지 기능이 마치 가지 뻗기처럼 추가되고 사라지기를 반복하는 
+  그런 과정을 의미하는 것이다.
+
+ 이밖에도 중앙 관리식, 분산형 등 여러가지 버전 컨트롤 오픈소스들에 대해서 배울 수 있었다.
