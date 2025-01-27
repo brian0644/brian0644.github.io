@@ -90,7 +90,10 @@ git reset 커밋 해시
 git revert 커밋 해시
 
 ```
+
+
  ### 여기서 add, commit이란
+ 
  작업트리 -> 스테이지 (add)
  스테이지 -> 저장소, 레포 (commit)
  이런 차이가 있다. 
