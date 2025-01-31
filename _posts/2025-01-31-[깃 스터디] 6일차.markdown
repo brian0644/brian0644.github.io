@@ -1,0 +1,15 @@
+---
+layout: post
+title:  "[깃 스터디] 2일차 정리"
+date:   2025-01-31 19:06 +09:00
+categories: khuda study
+---
+# 실습인증
+
+### 깃 데브
+<img width="1440" alt="스크린샷 2025-01-31 오후 7 05 14" src="https://github.com/user-attachments/assets/3f09cb1a-967e-4d6e-817a-5aa1c969afb1" />
+-> 오 편하군. 매번 웹사이트 들어가서 파일 다운받고 그랬는데 이럼 되겠군요
+
+### 깃허브 코파일럿
+<img width="1440" alt="스크린샷 2025-01-31 오후 7 05 54" src="https://github.com/user-attachments/assets/91a98c89-12e6-4419-b0fa-67e2eef98370" />
+-> 지피티 계정도 연동해서 쓸 수 있게 해줘요 !!! 
