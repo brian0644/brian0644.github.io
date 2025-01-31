@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "[깃 스터디] 2일차 정리"
+title:  "[깃 스터디] 6일차 정리"
 date:   2025-01-31 19:06 +09:00
 categories: khuda study
 ---
